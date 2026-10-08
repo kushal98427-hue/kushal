@@ -2,3 +2,4 @@
 work/
 broll/*.mp4
 !out/
+__pycache__/
