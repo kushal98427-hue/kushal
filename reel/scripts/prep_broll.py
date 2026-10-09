@@ -1,9 +1,10 @@
 """Conform the chosen B-roll for the renderer.
 
-For each slot: pick the clip in broll/slot<N>_*.mp4, conform to 25 fps
+For each slot: pick the (already trimmed, see fetch_broll.py archive) clip in
+broll/slot<N>_*.mp4, conform to 25 fps
 (24/25/30 fps footage is reinterpreted frame-for-frame = smooth slight slow-mo;
 50/60 fps drops every other frame first), scale-to-cover 1080x1920 with a
-centre crop (x offset override in work/broll_inpoints.json), trim to the slot
+centre crop (x offset "xoff" in broll_inpoints.json), trim to the slot
 length and store as work/broll_<N>.npy. Also fits the match-grade
 (work/broll_meta.json) that pulls each clip towards the studio footage.
 """
@@ -18,7 +19,7 @@ import numpy as np
 sys.path.insert(0, "scripts")
 from timeline import BROLL, FPS, H, W  # noqa: E402
 
-OVR = json.load(open("work/broll_inpoints.json")) if os.path.exists("work/broll_inpoints.json") else {}
+OVR = json.load(open("broll_inpoints.json")) if os.path.exists("broll_inpoints.json") else {}
 # studio footage reference, measured on the 9:16 crop of raw.mp4 (luma p50 0.056,
 # p95 0.516, chroma/mean-luma 0.17); B-roll is allowed to sit a touch brighter
 REF = dict(luma50=0.07, luma95=0.52, relchroma=0.17)
@@ -74,9 +75,9 @@ def main():
             continue
         n = round((slot["out"][1] - slot["out"][0]) * FPS)
         o = OVR.get(sid, {})
-        arr, fps = conform(files[0], o.get("start", 0.2), n, o.get("xoff", 0.0))
+        arr, fps = conform(files[0], o.get("trim_start", 0.0), n, o.get("xoff", 0.0))
         np.save(f"work/broll_{sid}.npy", arr)
-        meta[sid] = dict(fit_match(arr), file=files[0], src_fps=fps, start=o.get("start", 0.2), frames=n)
+        meta[sid] = dict(fit_match(arr), file=files[0], src_fps=fps, start=o.get("start", 0.2), frames=n)  # start = in-point in the full Pexels clip
         print(f"slot {sid}: {files[0]} @{fps:.2f}fps -> {n} frames, match {meta[sid]['gain']:.2f}/"
               f"{meta[sid]['gamma']:.2f}/{meta[sid]['sat']:.2f}")
     json.dump(meta, open("work/broll_meta.json", "w"), indent=1)

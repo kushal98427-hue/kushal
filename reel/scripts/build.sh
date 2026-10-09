@@ -18,6 +18,7 @@ if [[ $stage == broll || $stage == all ]]; then
   python3 scripts/fetch_broll.py search
   python3 scripts/fetch_broll.py analyze
   python3 scripts/fetch_broll.py download
+  python3 scripts/fetch_broll.py archive
   python3 scripts/prep_broll.py
 fi
 

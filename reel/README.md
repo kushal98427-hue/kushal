@@ -22,8 +22,9 @@ scripts/build.sh final      # render + mux out/AI_Reel_Final.mp4 and out/AI_Reel
 ```
 
 The automatic B-roll pick can be overridden in `work/broll_choice.json` (`{"<slot>": <pexels id>}`).
-In-points and horizontal crop offsets go in `work/broll_inpoints.json`
-(`{"<slot>": {"start": 1.5, "xoff": -0.3}}`).
+In-points (in the full Pexels clip) and horizontal crop offsets go in `broll_inpoints.json`
+(`{"<slot>": {"start": 1.5, "xoff": -0.3}}`); `fetch_broll.py archive` trims each chosen
+clip at its in-point into `broll/`, which is committed so re-renders don't need Pexels.
 
 `python3 scripts/render.py work/preview.mp4 --preview` renders with labelled placeholders
 for any B-roll slot that has no clip yet.

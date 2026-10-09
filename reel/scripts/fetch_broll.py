@@ -2,16 +2,21 @@
 
   python3 scripts/fetch_broll.py search     # query Pexels, keep viable portrait HD candidates
   python3 scripts/fetch_broll.py analyze    # download small renditions, score them, build broll_candidates.jpg
-  python3 scripts/fetch_broll.py download   # fetch the chosen HD files into broll/, write credits.txt
+  python3 scripts/fetch_broll.py download   # fetch the chosen HD files into work/broll_full/, write credits.txt
+  python3 scripts/fetch_broll.py archive    # trim each chosen clip at its in-point into broll/ (committed)
 
 The key is read from $PEXELS_API_KEY or from PEXELS_API_KEY in .env.
 work/broll_choice.json ({"<slot>": <pexels video id>}) overrides the automatic pick.
+broll_inpoints.json ({"<slot>": {"start": s, "xoff": -1..1}}) sets where each cutaway
+starts in the full clip and the horizontal crop offset; `archive` trims at "start".
 """
+import glob
 import json
 import os
 import subprocess
 import sys
 import time
+from fractions import Fraction
 
 import cv2
 import numpy as np
@@ -24,6 +29,7 @@ API = "https://api.pexels.com/videos/search"
 CAND_DIR = "work/candidates"  # downloaded third-party media: data only, never executed
 os.makedirs(CAND_DIR, exist_ok=True)
 os.makedirs("broll", exist_ok=True)
+os.makedirs("work/broll_full", exist_ok=True)
 
 
 def api_key():
@@ -95,7 +101,26 @@ def search():
 
 
 # ------------------------------------------------------------------ analysis
-FACE = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+_FACE = None
+
+
+def big_face(bgr):
+    """True when a face fills >12 % of the frame width — likely someone on camera."""
+    global _FACE
+    import mediapipe as mp
+    from mediapipe.tasks import python as mpt
+    from mediapipe.tasks.python import vision
+    if _FACE is None:
+        _FACE = vision.FaceLandmarker.create_from_options(vision.FaceLandmarkerOptions(
+            base_options=mpt.BaseOptions(model_asset_path="work/models/face_landmarker.task"), num_faces=3))
+    res = _FACE.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)))
+    for f in res.face_landmarks:
+        xs = [q.x for q in f]
+        if max(xs) - min(xs) > 0.12:
+            return True
+    return False
+
+
 STUDIO = dict(luma50=0.06, warm=0.03)  # measured on raw.mp4
 
 
@@ -117,11 +142,8 @@ def analyse_clip(path):
         flow.append(np.linalg.norm(fl, axis=2).mean())
     rgb = np.stack([cv2.cvtColor(cv2.resize(f, (180, 320)), cv2.COLOR_BGR2RGB) for f in frames[::5]]).astype(np.float32) / 255
     L = rgb @ np.float32([0.2126, 0.7152, 0.0722])
-    faces = 0
-    for f in frames[:: max(1, len(frames) // 6)]:
-        small = cv2.cvtColor(cv2.resize(f, (360, 640)), cv2.COLOR_BGR2GRAY)
-        fs = FACE.detectMultiScale(small, 1.15, 6, minSize=(60, 60))
-        faces += len(fs) > 0
+    picks = frames[:: max(1, len(frames) // 6)][:6]
+    faces = sum(big_face(cv2.resize(f, (360, 640))) for f in picks)
     return dict(fps=fps, motion=float(np.median(flow)), luma50=float(np.median(L)),
                 luma95=float(np.percentile(L, 95)), warm=float((rgb[..., 0] - rgb[..., 2]).mean()),
                 big_face_ratio=faces / 6.0, thumbs=[frames[i] for i in (0, len(frames) // 2, len(frames) - 1)])
@@ -208,7 +230,7 @@ def download():
     for slot in BROLL:
         sid = str(slot["id"])
         r = next(x for x in report[sid] if x["id"] == choice[sid])
-        dst = f"broll/slot{sid}_{r['id']}.mp4"
+        dst = f"work/broll_full/slot{sid}_{r['id']}.mp4"
         if not os.path.exists(dst):
             tmp = f"{CAND_DIR}/{r['id']}_hd.mp4"
             open(tmp, "wb").write(get(r["hd"]["link"]).content)
@@ -221,5 +243,32 @@ def download():
     open("credits.txt", "w").write("\n".join(lines) + "\n")
 
 
+def archive():
+    """Keep only the part of each chosen clip the edit uses (+0.5 s), scaled to
+    cover 1080x1920 and muted, so the reel can be re-rendered without Pexels."""
+    from timeline import FPS
+    inpoints = json.load(open("broll_inpoints.json")) if os.path.exists("broll_inpoints.json") else {}
+    for slot in BROLL:
+        sid = str(slot["id"])
+        full = sorted(glob.glob(f"work/broll_full/slot{sid}_*.mp4"))
+        if not full:
+            print(f"slot {sid}: nothing downloaded")
+            continue
+        src = full[0]
+        fps = float(Fraction(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                                             "stream=r_frame_rate", "-of", "csv=p=0", src],
+                                            capture_output=True, text=True).stdout.strip()))
+        n = round((slot["out"][1] - slot["out"][0]) * FPS)
+        need = n * (2 if fps > 45 else 1) / fps + 0.5
+        start = inpoints.get(sid, {}).get("start", 0.2)
+        for old in glob.glob(f"broll/slot{sid}_*.mp4"):
+            os.remove(old)
+        dst = f"broll/{os.path.basename(src)}"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{start:.3f}", "-i", src, "-t", f"{need:.3f}", "-an",
+                        "-vf", "scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos",
+                        "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", dst], check=True)
+        print(f"slot {sid}: {dst} ({start:.2f}s +{need:.2f}s @ {fps:g} fps)")
+
+
 if __name__ == "__main__":
-    {"search": search, "analyze": analyze, "download": download}[sys.argv[1]]()
+    {"search": search, "analyze": analyze, "download": download, "archive": archive}[sys.argv[1]]()
