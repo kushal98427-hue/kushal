@@ -1,18 +1,34 @@
-# Status — B-roll pass blocked at preflight (2026-10-09)
+# Status — B-roll checkpoint (Pixabay)
 
-Nothing was searched, downloaded, rendered or changed. The B-roll step stopped at preflight:
+B-roll comes from the Pixabay Videos API, because the Pexels keys are paused. The search
+queries, the 7 slots and the selection rules are unchanged from the brief; see
+`scripts/timeline.py` and `scripts/fetch_broll.py`.
 
-| check | result |
-|---|---|
-| `PEXELS_API_KEY` is set | **FAIL**: the variable isn't set in this environment |
-| `api.pexels.com` search returns 200 | **FAIL**: the egress proxy refused the connection (`connect_rejected`, organization network policy), so no HTTP code came back (000) |
-| `videos.pexels.com` connects | **FAIL**: `connect_rejected` by the egress proxy |
-| `images.pexels.com` connects | **FAIL**: `connect_rejected` by the egress proxy |
+Pixabay differs from Pexels in a few ways, and the script handles each:
+- There's no orientation filter, so orientation is checked client-side. Portrait is
+  preferred, then 4K landscape (its 9:16 crop is still ≥1080 px wide), then 1080p landscape,
+  whose crop gets upscaled about 1.8× and takes a score penalty.
+- Search matches *any* word, so a clip's tags must contain the query's content words
+  (at most one missing on 3+ word queries). Thin slots also review half-matches.
+- `video_type=film` is set, and anything flagged `isAiGenerated` or `isLowQuality` is
+  dropped, which keeps the footage real.
 
-## Unblocking it
+Picks were reviewed by eye (`broll_choice.json`), and rejections are recorded with
+reasons (`broll_rejects.json`). In-points and crop offsets are in `broll_inpoints.json`.
+The trimmed 1080×1920 clips are committed in `broll/`, and the sources are in `credits.txt`.
 
-1. Add `PEXELS_API_KEY` to the cloud environment's settings (environment menu → Edit → secrets / environment variables).
-2. Network access: in the same settings, allow `api.pexels.com`, `videos.pexels.com` and `images.pexels.com` under Allowed domains, or pick a broader access level. See <https://code.claude.com/docs/en/cloud-environments#network-access>.
-3. Start a new session, which picks up both changes, and re-run the B-roll task.
+| slot | line | Pixabay id | creator | source |
+|---|---|---|---|---|
+| 1 | एउटा कम्प्युटरले … केही सेकेन्डमै | 3160 | Coverr-Free-Footage | 1080p, ×1.8 crop |
+| 2 | अहिले AI ले ठ्याक्कै यही | 88223 | Digital_Expert | 4K |
+| 3 | टेक्स्ट लेख्ने | 78640 | Engin_Akyurt | 4K |
+| 4 | फोटो बनाउने | 42967 | MaxMedyk | 1080p, ×1.8 crop |
+| 5 | भिडियो तयार गर्ने | 26533 | ninosouza | 1080p, ×1.8 crop |
+| 6 | आजको समयमा AI | 139802 | Sang_Soi | 4K |
+| 7 | आफूलाई एक कदम अगाडि | 152203 | u_87zyvw82yc | 1080p, ×1.8 crop |
 
-The existing NoMusic preview with B-roll placeholders, described in README.md, is unchanged.
+The match grade now pulls each clip halfway toward the studio exposure, with gamma
+capped at 1.35. The earlier 60 % pull with a 1.6 cap crushed the typing close-up.
+
+Next: `scripts/build.sh final` (render + QC). Music is still missing, so only
+`out/AI_Reel_NoMusic.mp4` can be built until a track is added to `music/`.

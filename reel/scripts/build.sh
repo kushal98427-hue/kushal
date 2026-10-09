@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Full pipeline. Stages can be run one at a time:
 #   scripts/build.sh analyse    face track + timing check + captions + sound (no external deps)
-#   scripts/build.sh broll      Pexels search/score -> broll_candidates.jpg (checkpoint), download, conform
+#   scripts/build.sh broll      Pixabay search/score -> broll_candidates.jpg (checkpoint), download, conform
 #   scripts/build.sh final      render picture once, mux both deliverables, QC
 set -euo pipefail
 cd "$(dirname "$0")/.."

@@ -56,10 +56,11 @@ def fit_match(arr):
     L = f @ np.float32([0.2126, 0.7152, 0.0722])
     c50, c95 = np.percentile(L, 50) + 1e-3, np.percentile(L, 95) + 1e-3
     relchroma = np.abs(f - L[..., None]).mean() / (L.mean() + 1e-3)
-    # move 60% of the way (in log space) towards the studio look — keeps each clip's character
-    t50 = np.exp(0.4 * np.log(c50) + 0.6 * np.log(REF["luma50"]))
-    t95 = np.exp(0.4 * np.log(c95) + 0.6 * np.log(REF["luma95"]))
-    gamma = float(np.clip((np.log(t95) - np.log(t50)) / (np.log(c95) - np.log(c50)), 0.8, 1.6))
+    # move half the way (in log space) towards the studio look — keeps each clip's character;
+    # gamma above ~1.35 crushed close-ups (fingers on a keyboard vanished), so it is capped there
+    t50 = np.exp(0.5 * np.log(c50) + 0.5 * np.log(REF["luma50"]))
+    t95 = np.exp(0.5 * np.log(c95) + 0.5 * np.log(REF["luma95"]))
+    gamma = float(np.clip((np.log(t95) - np.log(t50)) / (np.log(c95) - np.log(c50)), 0.8, 1.35))
     gain = float(np.clip(np.exp(np.log(t50) / gamma - np.log(c50)), 0.5, 1.3))
     sat = float(np.clip((REF["relchroma"] / max(relchroma, 1e-3)) ** 0.5, 0.72, 0.95))
     return dict(gain=gain, gamma=gamma, sat=sat, luma50=float(c50), luma95=float(c95), relchroma=float(relchroma))
@@ -77,7 +78,8 @@ def main():
         o = OVR.get(sid, {})
         arr, fps = conform(files[0], o.get("trim_start", 0.0), n, o.get("xoff", 0.0))
         np.save(f"work/broll_{sid}.npy", arr)
-        meta[sid] = dict(fit_match(arr), file=files[0], src_fps=fps, start=o.get("start", 0.2), frames=n)  # start = in-point in the full Pexels clip
+        # "start" is the in-point in the full downloaded clip (archive already trimmed there)
+        meta[sid] = dict(fit_match(arr), file=files[0], src_fps=fps, start=o.get("start", 0.2), frames=n)
         print(f"slot {sid}: {files[0]} @{fps:.2f}fps -> {n} frames, match {meta[sid]['gain']:.2f}/"
               f"{meta[sid]['gamma']:.2f}/{meta[sid]['sat']:.2f}")
     json.dump(meta, open("work/broll_meta.json", "w"), indent=1)
