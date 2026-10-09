@@ -1,0 +1,4 @@
+# regenerable intermediates and third-party downloads
+work/
+!out/
+__pycache__/
