@@ -19,6 +19,10 @@ on:
         description: "Optional comma-separated subset of symbols (blank = all)"
         type: string
         default: ""
+      notify_selftest:
+        description: "Also verify ntfy delivery using a random throwaway topic"
+        type: boolean
+        default: false
 
 permissions:
   contents: write # only to push generated reports to the nepse-reports branch
@@ -142,14 +146,23 @@ jobs:
             git push origin HEAD:refs/heads/nepse-reports
           fi
 
+      - name: ntfy delivery self-test (throwaway topic, nothing printed)
+        if: ${{ inputs.notify_selftest }}
+        run: python -m nepse_ta notify --selftest
+
       - name: Phone notification (optional, free; needs NTFY_TOPIC or TELEGRAM_* secrets)
         if: success()
+        continue-on-error: true
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           REPORT_URL: https://github.com/${{ github.repository }}/blob/nepse-reports/reports/latest/master_np.md
-        run: python -m nepse_ta notify --url "$REPORT_URL"
+        run: |
+          if [ -z "$NTFY_TOPIC" ] && [ -z "$TELEGRAM_BOT_TOKEN" ]; then
+            echo "::warning title=No phone alert::NTFY_TOPIC secret is not set, so no notification was sent."
+          fi
+          python -m nepse_ta notify --url "$REPORT_URL"
 
       - name: Failure notification (optional)
         if: failure()

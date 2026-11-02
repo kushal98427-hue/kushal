@@ -95,11 +95,17 @@ def cmd_backtest(args: argparse.Namespace) -> int:
 
 
 def cmd_notify(args: argparse.Namespace) -> int:
-    from nepse_ta.notify import notify
+    from nepse_ta.notify import notify, selftest_ntfy
 
+    if args.selftest:
+        res = selftest_ntfy()
+        print(json.dumps({"ntfy_selftest": res}))
+        return 0 if all(res.values()) else 1
     res = notify(args.scan, args.url, failure=args.failure)
     print(json.dumps(res))
-    return 0  # notifications never fail the pipeline
+    # Exit 1 if a CONFIGURED channel failed (the workflow step is continue-on-error,
+    # so this marks the step red without failing the report job).
+    return 1 if any(v.startswith("error") for v in res.values()) else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -131,6 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     pn.add_argument("--scan", type=Path, default=ROOT / "reports" / "latest" / "scan.json")
     pn.add_argument("--url", help="Link to the report")
     pn.add_argument("--failure", help="Send a failure message instead of the summary")
+    pn.add_argument("--selftest", action="store_true", help="Publish+poll a random throwaway ntfy topic")
     pn.set_defaults(func=cmd_notify)
 
     args = parser.parse_args(argv)

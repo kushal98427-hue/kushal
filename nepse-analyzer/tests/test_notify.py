@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import pytest
 
-from nepse_ta.notify import build_message, notify
+from nepse_ta.notify import build_message, notify, selftest_ntfy
 
 SCAN = {
     "meta": {"market_date": "2026-10-30", "freshness": "stale", "expected_latest_session": "2026-11-02",
@@ -25,6 +25,13 @@ def server():
             self.send_response(200)
             self.end_headers()
             self.wfile.write(b"{}")
+
+        def do_GET(self):  # noqa: N802 - ntfy poll API: one JSON message per line
+            topic = self.path.split("/")[1]
+            lines = [json.dumps({"message": b["message"]}) for _, b in received if b.get("topic") == topic]
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write("\n".join(lines).encode())
 
         def log_message(self, *a):
             pass
@@ -72,3 +79,11 @@ def test_failure_does_not_raise(tmp_path, monkeypatch):
     p = tmp_path / "scan.json"
     p.write_text(json.dumps(SCAN))
     assert notify(p)["ntfy"].startswith("error")
+
+
+def test_selftest_publishes_and_polls(monkeypatch, server):
+    url, received = server
+    monkeypatch.setenv("NO_PROXY", "127.0.0.1")
+    res = selftest_ntfy(url)
+    assert res == {"published": True, "received_by_server": True}
+    assert received[0][1]["topic"].startswith("nepse-selftest-")

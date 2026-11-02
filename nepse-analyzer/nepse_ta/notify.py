@@ -15,6 +15,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import secrets
+import time
 from pathlib import Path
 
 import requests
@@ -81,4 +83,29 @@ def notify(scan_json_path: Path, report_url: str | None = None, failure: str | N
             # never print the URL: the Telegram URL contains the bot token
             out[name] = f"error: {type(exc).__name__}"
             log.warning("%s notification failed: %s", name, type(exc).__name__)
+    return out
+
+
+def selftest_ntfy(server: str | None = None) -> dict[str, bool]:
+    """Publish to a fresh random throwaway topic, then poll the server for it.
+
+    Proves the runner can reach ntfy and that our publish format is accepted, without
+    touching (or printing) the real topic. Returns booleans only.
+    """
+    server = (server or os.environ.get("NTFY_SERVER", "https://ntfy.sh")).rstrip("/")
+    topic = "nepse-selftest-" + secrets.token_urlsafe(18)
+    marker = secrets.token_hex(8)
+    session = make_session(retries=3)
+    out = {"published": False, "received_by_server": False}
+    try:
+        r = session.post(server, data=json.dumps({"topic": topic, "title": "NEPSE self-test", "message": marker}).encode(), timeout=20)
+        out["published"] = r.status_code == 200
+        for _ in range(5):
+            time.sleep(1)
+            g = session.get(f"{server}/{topic}/json", params={"poll": "1"}, timeout=20)
+            if g.ok and any(json.loads(line).get("message") == marker for line in g.text.splitlines() if line.strip()):
+                out["received_by_server"] = True
+                break
+    except requests.RequestException as exc:
+        log.warning("ntfy self-test failed: %s", type(exc).__name__)
     return out
