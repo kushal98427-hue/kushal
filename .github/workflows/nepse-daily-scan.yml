@@ -23,6 +23,10 @@ on:
         description: "Also verify ntfy delivery using a random throwaway topic"
         type: boolean
         default: false
+      diagnose_ntfy:
+        description: "Check the NTFY_TOPIC secret's format (prints only a fingerprint, never the value)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write # only to push generated reports to the nepse-reports branch
@@ -145,6 +149,12 @@ jobs:
             git commit -q -m "NEPSE reports $(date -u +%Y-%m-%dT%H:%MZ)"
             git push origin HEAD:refs/heads/nepse-reports
           fi
+
+      - name: Diagnose NTFY_TOPIC secret (fingerprint only)
+        if: ${{ inputs.diagnose_ntfy }}
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python -m nepse_ta notify --diagnose
 
       - name: ntfy delivery self-test (throwaway topic, nothing printed)
         if: ${{ inputs.notify_selftest }}

@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import pytest
 
-from nepse_ta.notify import build_message, notify, selftest_ntfy
+from nepse_ta.notify import build_message, diagnose_ntfy_secret, notify, selftest_ntfy
 
 SCAN = {
     "meta": {"market_date": "2026-10-30", "freshness": "stale", "expected_latest_session": "2026-11-02",
@@ -87,3 +87,13 @@ def test_selftest_publishes_and_polls(monkeypatch, server):
     res = selftest_ntfy(url)
     assert res == {"published": True, "received_by_server": True}
     assert received[0][1]["topic"].startswith("nepse-selftest-")
+
+
+def test_diagnose_never_returns_value(monkeypatch):
+    monkeypatch.setenv("NTFY_TOPIC", "NTFY_TOPIC")
+    d = diagnose_ntfy_secret()
+    assert d["is_literal_text_NTFY_TOPIC"] is True
+    monkeypatch.setenv("NTFY_TOPIC", " nepse-abcDEF123 \n")
+    d = diagnose_ntfy_secret()
+    assert d["has_leading_or_trailing_whitespace"] and d["starts_with_nepse_dash"] and d["valid_ntfy_topic_chars"]
+    assert "nepse-abcDEF123" not in str(d)

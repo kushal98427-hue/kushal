@@ -95,8 +95,11 @@ def cmd_backtest(args: argparse.Namespace) -> int:
 
 
 def cmd_notify(args: argparse.Namespace) -> int:
-    from nepse_ta.notify import notify, selftest_ntfy
+    from nepse_ta.notify import diagnose_ntfy_secret, notify, selftest_ntfy
 
+    if args.diagnose:
+        print(json.dumps({"ntfy_secret_diagnosis": diagnose_ntfy_secret()}))
+        return 0
     if args.selftest:
         res = selftest_ntfy()
         print(json.dumps({"ntfy_selftest": res}))
@@ -138,6 +141,7 @@ def main(argv: list[str] | None = None) -> int:
     pn.add_argument("--url", help="Link to the report")
     pn.add_argument("--failure", help="Send a failure message instead of the summary")
     pn.add_argument("--selftest", action="store_true", help="Publish+poll a random throwaway ntfy topic")
+    pn.add_argument("--diagnose", action="store_true", help="Check NTFY_TOPIC shape/fingerprint without printing it")
     pn.set_defaults(func=cmd_notify)
 
     args = parser.parse_args(argv)

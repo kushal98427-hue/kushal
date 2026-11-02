@@ -109,3 +109,24 @@ def selftest_ntfy(server: str | None = None) -> dict[str, bool]:
     except requests.RequestException as exc:
         log.warning("ntfy self-test failed: %s", type(exc).__name__)
     return out
+
+
+def diagnose_ntfy_secret() -> dict:
+    """Describe NTFY_TOPIC WITHOUT revealing it: shape checks + a short SHA-256 fingerprint."""
+    import hashlib
+    import re
+
+    raw = os.environ.get("NTFY_TOPIC")
+    if raw is None or raw == "":
+        return {"configured": False}
+    v = raw.strip()
+    return {
+        "configured": True,
+        "length": len(raw),
+        "is_literal_text_NTFY_TOPIC": v.upper() in ("NTFY_TOPIC", "$NTFY_TOPIC", "${NTFY_TOPIC}"),
+        "has_leading_or_trailing_whitespace": raw != v,
+        "contains_url_or_slash": "/" in v or "ntfy.sh" in v.lower(),
+        "valid_ntfy_topic_chars": bool(re.fullmatch(r"[-_A-Za-z0-9]{1,64}", v)),
+        "starts_with_nepse_dash": v.startswith("nepse-"),
+        "sha256_prefix": hashlib.sha256(v.encode()).hexdigest()[:12],
+    }
