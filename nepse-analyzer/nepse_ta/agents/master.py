@@ -38,7 +38,7 @@ class MasterAgent:
         watch = sorted([a for r in reports for a in r.watchlist], key=rank_key)[: self.watchlist_size]
         notes = []
         if not top:
-            notes.append("आज मापदण्ड पूरा गर्ने कुनै सेटअप भेटिएन। जबरजस्ती सिफारिस गरिएको छैन।")
+            notes.append("यो डाटा मितिमा मापदण्ड पूरा गर्ने कुनै सेटअप भेटिएन। जबरजस्ती सिफारिस गरिएको छैन।")
         # concentration check: avoid a list dominated by one sector without saying so
         if top:
             counts: dict[str, int] = {}

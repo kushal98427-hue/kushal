@@ -73,11 +73,12 @@ def test_end_to_end_scan_and_reports(tmp_path):
     d, sm = _setup_dir(tmp_path)
     fetch = load_from_local_dir(d)
     last = pd.Timestamp(make_ohlc(n=320).index[-1])
-    now = dt.datetime.combine(last.date() + dt.timedelta(days=1), dt.time(12), tzinfo=dt.timezone.utc)
+    # 12:00 UTC = 17:45 Nepal, after the 15:00 close of the same day -> current
+    now = dt.datetime.combine(last.date(), dt.time(12), tzinfo=dt.timezone.utc)
     res = run_scan(fetch, sm, now_utc=now)
 
     syms = {a.symbol: a for a in res.analyses}
-    assert res.freshness == "ok"
+    assert res.freshness == "current"
     assert "DEB" in res.excluded_instruments and "DEB" not in syms
     assert syms["STL"].stale and not syms["STL"].eligible
     assert [a.symbol for a in res.unclassified] == ["UNK"]
@@ -109,4 +110,15 @@ def test_stale_market_blocks_all_setups(tmp_path):
     assert res.master.no_valid_setup and not res.master.top_setups
     assert not any(a.eligible for a in res.analyses)
     md = markdown_np.master_markdown(res)
-    assert "आज कुनै मान्य सेटअप छैन" in md
+    assert "कुनै मान्य सेटअप छैन — No valid setup" in md and "BLOCKED" in md
+
+
+def test_next_day_run_is_marked_stale_not_today(tmp_path):
+    d, sm = _setup_dir(tmp_path)
+    last = pd.Timestamp(make_ohlc(n=320).index[-1])  # a business day
+    nxt = last + pd.offsets.BDay(1)
+    now = dt.datetime.combine(nxt.date(), dt.time(12), tzinfo=dt.timezone.utc)  # 21:00 KST next session day
+    res = run_scan(load_from_local_dir(d), sm, now_utc=now)
+    assert res.freshness == "stale" and res.fresh.sessions_missing == 1
+    md = markdown_np.master_markdown(res)
+    assert "STALE" in md and f"{last.date()}" in md and "को बजारको होइन" in md

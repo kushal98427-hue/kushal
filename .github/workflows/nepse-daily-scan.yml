@@ -3,9 +3,9 @@ name: NEPSE daily technical scan
 # 21:00 Korea time (Asia/Seoul, UTC+9) = 12:00 UTC.
 # Korea has no daylight-saving time (and GitHub cron is always UTC), so this
 # is 21:00 KST all year. GitHub may start scheduled jobs a few minutes late.
-# Note: the source repo (Aabishkar2/nepse-data) updates 13:00-17:00 UTC, so a
-# 12:00 UTC run analyses the PREVIOUS trading session. The report always prints
-# the exact data date.
+# Verified from the source repo's history (296 "Update data" commits, 2025-07..2026-10):
+# no update ever landed before 12:00 UTC; recent ones land ~17:00-21:30 UTC. So this
+# 21:00 KST run analyses the PREVIOUS session and the report is marked STALE.
 on:
   schedule:
     - cron: "0 12 * * *"
@@ -64,8 +64,9 @@ jobs:
           mkdir -p reports/backtest
           if git ls-remote --exit-code --heads origin nepse-reports >/dev/null 2>&1; then
             git fetch --depth=1 origin nepse-reports
-            git show FETCH_HEAD:reports/backtest/latest.json > reports/backtest/latest.json 2>/dev/null \
-              || rm -f reports/backtest/latest.json
+            # restore the WHOLE folder: the publish step replaces reports/backtest as a unit
+            git -C "$(git rev-parse --show-toplevel)" archive FETCH_HEAD reports/backtest 2>/dev/null \
+              | tar -x -C . || echo "no previous backtest on branch"
           fi
           ls -la reports/backtest || true
 
@@ -96,6 +97,11 @@ jobs:
             ARGS="$ARGS --symbols $SYMBOLS"
           fi
           python -m nepse_ta scan $ARGS
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ -f reports/latest/master_np.md ]; then head -n 40 reports/latest/master_np.md >> "$GITHUB_STEP_SUMMARY"; fi
 
       - name: Upload reports artifact
         uses: actions/upload-artifact@v4
@@ -135,3 +141,21 @@ jobs:
             git commit -q -m "NEPSE reports $(date -u +%Y-%m-%dT%H:%MZ)"
             git push origin HEAD:refs/heads/nepse-reports
           fi
+
+      - name: Phone notification (optional, free; needs NTFY_TOPIC or TELEGRAM_* secrets)
+        if: success()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REPORT_URL: https://github.com/${{ github.repository }}/blob/nepse-reports/reports/latest/master_np.md
+        run: python -m nepse_ta notify --url "$REPORT_URL"
+
+      - name: Failure notification (optional)
+        if: failure()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python -m nepse_ta notify --failure "Workflow failed" --url "$RUN_URL" || true

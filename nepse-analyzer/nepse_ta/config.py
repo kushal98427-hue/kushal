@@ -40,8 +40,10 @@ class DataConfig:
     adjustment_max_gap_days: int = 14
     #: Sessions needed before any analysis is produced.
     min_history: int = 60
-    #: Market-level freshness (calendar days, Nepal date) -> warning / block setups.
-    market_stale_warn_days: int = 4
+    #: Market-level freshness (see nepse_ta/freshness.py). Data missing >= this many
+    #: expected trading sessions, or older than ``market_stale_block_days`` calendar
+    #: days, blocks the setup list. 1-3 missing sessions = "stale" (shown, clearly marked).
+    stale_block_sessions: int = 4
     market_stale_block_days: int = 10
     #: A stock whose last row is this many market sessions behind the market's
     #: latest session is "stale" and excluded from setup ranking.
@@ -109,6 +111,13 @@ class BacktestConfig:
     #: NEPSE settles T+2: shares bought cannot be sold for this many sessions.
     min_hold_sessions: int = 3
     max_hold_sessions: int = 20
+    #: Skip the signal if the stock's next bar is more than this many calendar days later
+    #: (illiquid stock did not trade; entering weeks later would be a stale signal).
+    max_entry_delay_days: int = 5
+    #: Model NEPSE +/-10% circuit locks: a bar traded at a single price at the limit
+    #: cannot be bought (upper) or sold (lower) that day.
+    model_circuit_locks: bool = True
+    circuit_lock_pct: float = 9.5
     #: Skip entry if next open is above entry-zone high by more than this fraction.
     max_entry_gap_pct: float = 1.0
     #: Walk-forward: first out-of-sample year (train = all prior years, expanding).

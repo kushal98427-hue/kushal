@@ -64,7 +64,11 @@ def cmd_scan(args: argparse.Namespace) -> int:
         shutil.rmtree(latest)
     shutil.copytree(out_dir, latest)
     m = res.master
-    print(f"Market date: {res.market_date} | freshness: {res.freshness} ({res.data_age_days} days)")
+    fr = res.fresh
+    print(
+        f"Market date: {res.market_date} | freshness: {res.freshness} | expected session: "
+        f"{fr.expected_session if fr else '?'} | missing sessions: {fr.sessions_missing if fr else '?'}"
+    )
     print(f"Analysed: {len(res.analyses)} | unclassified: {len(res.unclassified)} | failures: {len(res.failures)}")
     print("Top setups: " + (", ".join(a.symbol for a in m.top_setups) or "NONE (no valid setup today)"))
     print(f"Reports written to {out_dir}")
@@ -84,10 +88,18 @@ def cmd_backtest(args: argparse.Namespace) -> int:
     path = save_backtest(result, args.out)
     write_backtest_md(result, args.out / "backtest_np.md")
     s = result["summary_all"]
-    print(json.dumps({k: s.get(k) for k in ("trades", "win_rate_pct", "t1_hit_rate_pct", "expectancy_r", "max_drawdown_pct_at_10pct_alloc")}))
+    print(json.dumps({k: s.get(k) for k in ("trades", "win_rate_pct", "t1_hit_rate_pct", "expectancy_r", "max_drawdown_r")}))
     print(f"Calibrated: {result['calibrated']} — {result.get('walk_forward', {}).get('reason')}")
     print(f"Saved {path}")
     return 0
+
+
+def cmd_notify(args: argparse.Namespace) -> int:
+    from nepse_ta.notify import notify
+
+    res = notify(args.scan, args.url, failure=args.failure)
+    print(json.dumps(res))
+    return 0  # notifications never fail the pipeline
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -114,6 +126,12 @@ def main(argv: list[str] | None = None) -> int:
     pb.add_argument("--out", type=Path, default=ROOT / "reports" / "backtest")
     pb.add_argument("--workers", type=int, default=None)
     pb.set_defaults(func=cmd_backtest)
+
+    pn = sub.add_parser("notify", help="Send optional ntfy/Telegram notification (needs secrets)")
+    pn.add_argument("--scan", type=Path, default=ROOT / "reports" / "latest" / "scan.json")
+    pn.add_argument("--url", help="Link to the report")
+    pn.add_argument("--failure", help="Send a failure message instead of the summary")
+    pn.set_defaults(func=cmd_notify)
 
     args = parser.parse_args(argv)
     logging.basicConfig(

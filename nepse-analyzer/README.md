@@ -38,8 +38,11 @@ five sector agents plus a master agent, and publishes Nepali Markdown, CSV and J
   adjustment factor (example: NABIL 2026-09-30, factor 0.952 = 5% bonus) and back-adjusts history.
 * Quality issues found: duplicate dates in 122 files, unsorted rows in 104, ~40k rows (mostly
   2011–2018) where high/low do not contain open/close, 14 non-positive prices.
-* Trading days are Sunday–Thursday (plus some Fridays in 2022 and 2026).
-* The source updates itself 13:00–17:00 UTC (18:45–22:45 Nepal time).
+* Trading days **changed in 2026**: Sunday–Thursday in 2025, Monday–Friday since mid-2026.
+  The freshness check infers the weekdays from the last 40 sessions instead of hard-coding them.
+* The source's updater is scheduled 13:00–17:00 UTC, but its commit history (296 "Update data"
+  commits, 2025-07 → 2026-10) shows **no update ever before 12:00 UTC**, and recent ones at
+  ~17:00–21:30 UTC.
 
 ---
 
@@ -91,10 +94,16 @@ Workflow: [`.github/workflows/nepse-daily-scan.yml`](../.github/workflows/nepse-
 * **Schedule:** `cron: "0 12 * * *"` → 12:00 UTC = **21:00 KST** (UTC+9). South Korea has no
   daylight-saving time and GitHub cron always runs in UTC, so the time never shifts. (Nepal has no
   DST either.) GitHub can start scheduled jobs a few minutes late at busy times.
-* **Important timing note:** at 21:00 KST it is 17:45 in Nepal, *before* the source repo's first
-  update attempt (18:45 NPT). So the 21:00 run analyses the **previous** trading session. The report
-  always shows the exact data date. If you want same-day data, change the cron to e.g.
-  `"30 18 * * *"` (03:30 KST next morning).
+* **Important timing note:** at 21:00 KST it is 17:45 in Nepal. The market closed at 15:00, but the
+  source repository has never published same-day data that early. So on a trading day the 21:00 run
+  analyses the **previous** session and every report says so at the top
+  (`⚠️ STALE — यो रिपोर्ट <date> को ... आज <date> को बजारको होइन`).
+* **Freshness rules** (`nepse_ta/freshness.py`): expected session = latest trading weekday whose
+  15:00 NPT close has passed. `current` = data date equals it; `stale` = 1–3 sessions missing (setups
+  still shown, clearly marked); `blocked` = 4+ sessions or >10 days (setup list suppressed). Public
+  holidays are not known, so a holiday shows as `stale` with a note.
+* Same-day data would need a later schedule; from the commit history even 03:30 KST is not always
+  late enough (some updates landed 21:26 UTC = 06:26 KST). The 21:00 schedule is kept as requested.
 * **Manual run:** GitHub → *Actions* → *NEPSE daily technical scan* → *Run workflow* (options:
   re-run backtest, subset of symbols).
 * **Outputs:** (1) a downloadable artifact on each run (kept 30 days), and (2) commits to a dedicated
@@ -104,6 +113,20 @@ Workflow: [`.github/workflows/nepse-daily-scan.yml`](../.github/workflows/nepse-
 * **Permissions:** only `contents: write` (to push the reports branch). Source data is only read.
 * **Scheduled workflows run from the default branch**, so this file must be on the repository's
   default branch for the 21:00 schedule to start.
+
+### Phone notifications (optional, free, off by default)
+
+Nothing is sent until you add a secret. Two free options are built in:
+
+* **ntfy (simplest, no account):** install the *ntfy* app (Android/iOS), subscribe to a long random
+  topic name (e.g. `nepse-k7Qx9v2mLp4w`), and add that name as the GitHub secret `NTFY_TOPIC`.
+  Anyone who knows the topic name can read the messages, so keep it random.
+* **Telegram:** create a bot with @BotFather, send it one message, get your chat id, then add secrets
+  `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
+
+The message contains the data date, STALE/BLOCKED status, any master-list setups and the
+historical-expectancy warning. A failed workflow also sends a failure message. GitHub itself emails
+you about failed scheduled runs (Settings → Notifications → Actions).
 
 ### Optional AI narrative (paid, off by default)
 

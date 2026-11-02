@@ -15,6 +15,7 @@ from nepse_ta.analysis import SETUP_TYPES, StockAnalysis, analyze_at, prepare_fr
 from nepse_ta.config import DEFAULT_SETTINGS, NEPAL_TZ, SEOUL_TZ, Settings
 from nepse_ta.data.fetcher import FetchResult, SourceInfo
 from nepse_ta.data.validation import CleanSeries, prepare_series
+from nepse_ta.freshness import Freshness, assess, banner_np
 from nepse_ta.scoring import score_bucket
 from nepse_ta.sectors import EXCLUDED, SECTOR_AGENTS, UNCLASSIFIED, SectorInfo, unclassified
 
@@ -29,7 +30,7 @@ class ScanResult:
     run_at_seoul: str
     market_date: str | None
     data_age_days: int | None
-    freshness: str  # "ok" | "warn" | "blocked"
+    freshness: str  # "current" | "stale" | "blocked"
     source: SourceInfo
     analyses: list[StockAnalysis]
     agent_reports: list[AgentReport]
@@ -42,6 +43,7 @@ class ScanResult:
     quality_totals: dict[str, int] = field(default_factory=dict)
     calibration: dict | None = None
     backtest: dict | None = None  # latest backtest summary (shown even when not calibrated)
+    fresh: Freshness | None = None
 
 
 def market_session_dates(series: dict[str, CleanSeries], min_share: float = 0.25) -> list[pd.Timestamp]:
@@ -82,19 +84,16 @@ def run_scan(
 
     sessions = market_session_dates(series)
     market_date = sessions[-1] if sessions else None
-    nepal_today = now_utc.astimezone(ZoneInfo(NEPAL_TZ)).date()
-    age = (nepal_today - market_date.date()).days if market_date is not None else None
-    if age is None:
-        freshness = "blocked"
-        warnings.append("कुनै प्रयोगयोग्य डाटा भेटिएन")
-    elif age > dcfg.market_stale_block_days:
-        freshness = "blocked"
-        warnings.append(f"डाटा {age} दिन पुरानो छ — सेटअप सूची रोकिएको (सीमा {dcfg.market_stale_block_days} दिन)")
-    elif age > dcfg.market_stale_warn_days:
-        freshness = "warn"
-        warnings.append(f"डाटा {age} दिन पुरानो छ — बिदा वा स्रोत अपडेट नभएको हुन सक्छ")
-    else:
-        freshness = "ok"
+    nepal_now = now_utc.astimezone(ZoneInfo(NEPAL_TZ))
+    fresh = assess(
+        market_date.date() if market_date is not None else None,
+        sessions,
+        nepal_now,
+        block_sessions=dcfg.stale_block_sessions,
+        block_days=dcfg.market_stale_block_days,
+    )
+    freshness, age = fresh.status, fresh.calendar_age_days
+    warnings.append(banner_np(fresh))
     if fetch.source.commit_date_utc:
         warnings.append(f"स्रोत रिपोजिटरीको अन्तिम commit: {fetch.source.commit_date_utc} (UTC)")
 
@@ -160,7 +159,7 @@ def run_scan(
     for a in analyses:
         (by_agent[a.agent] if a.agent in by_agent else uncls).append(a)
     reports = [SectorAgent(k).run(by_agent[k]) for k in SECTOR_AGENTS]
-    blocked = None if freshness != "blocked" else warnings[0]
+    blocked = None if freshness != "blocked" else banner_np(fresh)
     master = MasterAgent().run(reports, blocked_reason=blocked)
 
     if failures:
@@ -184,6 +183,7 @@ def run_scan(
         quality_totals=totals,
         calibration=calibration,
         backtest=backtest,
+        fresh=fresh,
     )
 
 
@@ -192,7 +192,7 @@ def _set_eligibility(a: StockAnalysis, settings: Settings, freshness: str) -> No
     acfg = settings.analysis
     reasons = []
     if a.plan.plan_type not in SETUP_TYPES:
-        reasons.append("आज सक्रिय सेटअप छैन")
+        reasons.append("सक्रिय सेटअप छैन")
     if a.plan.rr1 is None or a.plan.rr1 < acfg.min_rr_for_valid_setup:
         reasons.append(f"R:R {a.plan.rr1} < {acfg.min_rr_for_valid_setup}")
     if a.score < acfg.min_score_for_master:
