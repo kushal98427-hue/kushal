@@ -1,0 +1,9 @@
+# Exact versions this system was tested with (Python 3.12/3.13).
+numpy==2.5.3
+pandas==3.0.5
+requests==2.34.2
+urllib3==2.8.0
+tzdata>=2024.1  # time-zone database for Windows / slim images (zoneinfo)
+pytest==9.2.0
+# Optional, only for the AI narrative (needs the ANTHROPIC_API_KEY secret; paid API):
+#   pip install "anthropic>=1.0"

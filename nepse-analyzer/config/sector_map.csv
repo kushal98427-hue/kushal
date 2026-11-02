@@ -1,0 +1,373 @@
+symbol,company_name,sector,instrument_type,nepse_status,agent,confidence,note
+ACLBSL,Aarambha Chautari Laghubitta Bittya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+ADBL,Agricultural Development Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+AHL,Asian Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+AHPC,Arun Valley Hydropower Development Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+AKJCL,Ankhu Khola Jalvidhyut Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+AKPL,Arun Kabeli Power Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+ALBSL,Asha Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+ALICL,Asian Life Insurance Co Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+ANLB,Aatmanirbhar Laghubitta Bittitya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+APHL,Appolo Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+API,API POWER COMPANY LIMITED,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+AVYAN,Aviyan laghubittya bittiya sanstha limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+BANDIPUR,Bandipur Cable Car and Tourism Limited,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+BARUN,Barun Hydropower Co. Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BBC,Bishal Bazar Company Limited,Tradings,Equity,A,agent5_other_sectors,high,both sources agree
+BEDC,Bhugol Energy Development Company Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BFC,Best Finance Company Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+BGWT,Bhagawati Hyropower Development Company Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BHCL,Bikash Hydropower Company Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BHDC,Bindhyabasini Hydropower Development Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BHL,Balephi Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BHPL,Barahi Hydropower Public Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BJHL,Bhujung Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BNHC,Buddha bhumi nepal hydro power company limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BNT,Bottlers Nepal (Terai) Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+BOKL,Bank of Kathmandu Ltd.,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+BPCL,Butwal Power Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+BUNGAL,Bungal Hydro Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+C30MF,Citizens Bank International Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+CBBL,Chhimek Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+CBL,Civil Bank Ltd,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+CBLD88,Civil Bank Ltd,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+CCBL,Century Commercial Bank Ltd.,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+CFCL,Central Finance Co. Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+CFL,Crystal Finance Ltd.,Finance,Equity,S,agent2_devbank_finance,high,both sources agree
+CGH,Chandragiri Hills Limited,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+CHCL,Chilime Hydropower Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+CHDC,CEDB Hydropower Development Company Limited,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+CHL,Chhyangdi Hydropower Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+CIT,Citizen Investment Trust,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+CITY,CITY HOTEL LIMITED ,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+CIZBD90,Citizens Bank International Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+CKHL,Chirkhwa Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+CLI,Citizen Life Insurance Company Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+CMB,Capital Merchant Bank & Finance Co. Ltd.,Finance,Equity,S,agent2_devbank_finance,high,both sources agree
+CMF2,CBIL Capital Limited,Mutual Fund,Mutual Funds,D,agent5_other_sectors,high,both sources agree
+CORBL,Corporate Development Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+CREST,Crest Micro Life Insurance Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+CSY,Citizens Bank International Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+CYCL,CYC Nepal laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+CZBIL,Citizens Bank International Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+DDBL,Deprosc Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+DHEL,Daramkhola hydro Energy Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+DHPL,Dibyashwori Hydropower Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+DLBS,Dhaulagiri laghubitta Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+DOLTI,Dolti Power Company Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+DORDI,Dordi Khola Jal Bidyut Company limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+EBL,Everest Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+EBLD85,Everest Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+EBLD91,Everest Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+EDBL,Excel Development Bank Ltd.,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+EHPL,Eastern Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+ENL,Emerging nepal limited,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+FMDBL,First Micro Finance Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+FOWAD,Forward Microfinance Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+GBBD85,Garima Bikas Bank Limited,Development Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+GBBL,Garima Bikas Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+GBIME,Global IME Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+GBIMESY2,Global IME Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+GBLBS,Grameen Bikas Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+GCIL,Ghorahi Cement Industry Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+GFCL,Goodwill Finance Limited,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+GHL,Ghalemdi Hydro Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+GIBF1,Global IME Balanced Fund-1,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+GILB,Global IME Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+GLBSL,Gurans Laghubitta Bittiya Sanstha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+GLH,Greenlife Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+GLICL,Gurans Life Insurance Company Ltd.,Life Insurance,Equity,D,agent4_insurance,high,both sources agree
+GMFBS,Ganapati Laghubitta Bittiya Sanstha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+GMFIL,Guheswori Merchant Banking & Finance Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+GMLI,GUARDIAN MICRO LIFE INSURANCE LIMITED,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+GRDBL,Green Development Bank Ltd.,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+GSY,Garima Bikas Bank Limited,Development Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+GUFL,Gurkhas Finance Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+GVL,Green Ventures Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+GWFD83,Goodwill Finance Limited,Finance,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+H8020,Himalayan Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+HATHY,HATHWAY INVESTMENT NEPAL LIMITED,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+HBL,Himalayan Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+HDHPC,Himal Dolakha Hydropower Com. Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+HDL,Himalayan Distillery Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+HEI,Himalayan Everest Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+HEIP,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+HFIN,Hotel Forest Inn Limited,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+HHL,Himalayan Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+HIDCL,Hydorelectricity Investment and Development Company Ltd,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+HIDCLP,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+HIMSTAR,Himstar Urja Company Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+HLBSL,Himalayan Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+HLI,Himalayan Life Insurance Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+HLICF,Himalayan Life Insurance Limited,Life Insurance,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+HPPL,Himalayan Power Partner Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+HRL,Himalayan Reinsurance Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+HURJA,Himalaya Urja Bikas Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+ICFC,ICFC Finance Limited,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+ICFCD88,ICFC Finance Limited,Finance,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+ICFCD89,ICFC Finance Limited,Finance,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+IGI,IGI Prudential Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+IHL,Ingwa Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+ILBS,Infinity Laghubitta Bittiya Sastha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+ILI,I.M.E. Life Insurance company Limited ,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+JBBL,Jyoti Bikas Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+JBLB,Jeevan Bikas Laghubitta Bittiya Sanstha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+JFL,Janaki Finance Company Limited,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+JHAPA,Jhapa Energy Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+JLI,Jyoti Life Insurance Company Limited,Life Insurance,Equity,D,agent4_insurance,high,both sources agree
+JOSHI,Joshi Hydropower Development Company Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+JSLBB,Janautthan Samudayic Laghubitta Bittya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+KBL,Kumari Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+KBLD90,Kumari Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+KBSH,Kutheli Bukhari Small Hydropower Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+KDBY,Kumari Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+KDL,KALINCHOWK DARSHAN LIMITED ,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+KEF,Kumari Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+KHPL,Kalinchock Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+KKHC,Khanikhola Hydropower Co. Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+KMCDB,Kalika Laghubitta Bittiya Sanstha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+KPCL,Kalika power Company Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+KRBL,Karnali Development Bank Limited,Development Banks,Equity,S,agent2_devbank_finance,high,both sources agree
+KSBBL,Kamana Sewa Bikas Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+KSY,Kumari Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+LBBL,Lumbini Bikas Bank Ltd.,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+LBL,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+LEC,Liberty Energy Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+LICN,Life Insurance Corporation (Nepal) Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+LLBS,Laxmi Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+LSL,Laxmi Sunrise Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+LUK,Laxmi Capital Market Limited,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+LVF2,Laxmi Sunrise Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+MABEL,Mabilung Energy Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MAKAR,Makar Jitumaya Suri Hydropower Ltd ,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MANDU,Mandu Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MATRI,Matribhumi Lagubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+MBJC,Madhya Bhotekoshi Jalavidyut Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MBL,Machhapuchhre Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+MBLD87,Machhapuchhre Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+MBLEF,Machhapuchhre Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+MCHL,Menchhiyam Hydro Power Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MDB,Miteri Development Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+MEGA,Mega  Bank Nepal Ltd.,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+MEHL,Manakamana Engineering Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MEL,Modi Energy Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MEN,Mountain Energy Nepal Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MERO,Meromicrofinance Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+MFIL,Manjushree Finance Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+MHCL,Molung Hydropower Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MHL,Mandakini Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MHNL,Mountain Hydro Nepal Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MKCL,Muktinath Krishi Company Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+MKHC,Maya Khola Hydropower Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MKHL,MaiKhola Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MKJC,Mailung Khola Jal Vidhyut Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MLBBL,Mithila LaghuBitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+MLBL,Mahalaxmi Bikas Bank Ltd.,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+MLBLD89,Mahalaxmi Bikas Bank Ltd.,Development Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+MLBS,Manushi Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+MLBSL,Mahila Laghubitta Bittiya Sanstha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+MMF1,Mega  Bank Nepal Ltd.,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+MMKJL,Mathillo Mailun Khola Jalvidhyut Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MNBBL,Muktinath Bikas Bank Ltd.,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+MNMF1,Muktinath Bikas Bank Ltd.,Development Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+MPFL,Multipurpose Finance Company  Limited,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+MSHL,Mid solu Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+MSLB,Mahuli Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NABBC,Narayani Development Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+NABIL,Nabil Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+NADEP,Nadep Laghubittiya bittya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NBB,Nepal Bangladesh Bank Limited,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+NBBD2085,Nepal Bangladesh Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+NBF2,Nabil Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NBF3,Nabil Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NBL,Nepal Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+NBLD82,Nabil Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+NBLD85,Nabil Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+NBLD87,Nepal Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+NCCB,Nepal Credit And Commercial Bank Limited,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+NESDO,NESDO Sambridha Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NFS,Nepal Finance Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+NGPL,Ngadi Group Power Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+NHDL,Nepal Hydro Developers Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+NHPC,National Hydro Power Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+NIB,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+NIBLGF,NIBL Growth Fund,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NIBLSTF,Nepal Investment Mega Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NIBSF2,Nepal Investment Mega Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NICA,NIC Asia Bank Ltd.,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+NICBF,NIC ASIA Capital Ltd,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NICFC,NIC Asia Bank Ltd.,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NICGF2,NIC Asia Bank Ltd.,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NICL,Nepal Insurance Co. Ltd.,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+NICLBSL,NIC ASIA Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NICSF,NIC ASIA Capital Ltd,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NIFRA,Nepal Infrastructure Bank Limited,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+NIFRAGED,Nepal Infrastructure Bank Limited,Investment,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+NIL,Neco Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+NIMB,Nepal Investment Mega Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+NIMBPO,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+NLG,NLG Insurance Company Ltd.,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+NLIC,NEPAL LIFE INSURANCE COMPANY LIMITED,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+NLICL,National Life Insurance Co. Ltd.,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+NMB,NMB Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+NMB50,NMB Capital Ltd.,Mutual Fund,Mutual Funds,D,agent5_other_sectors,high,both sources agree
+NMBHF2,NMB Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NMBMF,NMB  Microfinance Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NMFBS,National  Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NMIC,Nepal Micro Insurance Company Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+NMLBBL,Nerude Mirmire Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NRIC,Nepal Reinsurance Company Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+NRM,Nepal Republic Media Ltd,Others,Equity,A,agent5_other_sectors,high,both sources agree
+NRN,NRN Infrastructure and Development Limited,Investment,Equity,A,agent5_other_sectors,high,both sources agree
+NSIF2,NMB Capital Ltd.,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NSY,NEPAL LIFE INSURANCE COMPANY LIMITED,Life Insurance,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+NTC,Nepal Doorsanchar Company Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+NUBL,Nirdhan Utthan Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+NWCL,Nepal Warehousing Company Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+NYADI,Nyadi hydropower limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+OHL,Oriental Hotels Limited,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+OMPL,Om Megashree Pharmaceuticals Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+PBD88,Prime Commercial Bank Ltd.,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+PBLD84,Prabhu  Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+PBLD87,Prabhu  Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+PCBL,Prime Commercial Bank Ltd.,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+PCIL,Palpa Cement Industries Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+PFL,Pokhara Finance Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+PHCL,Peoples Hydropower Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+PLI,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+PLIC,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+PMHPL,Panchakanya Mai Hydropower Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+PMLI,Prabhu Mahalaxmi Life Insurance Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+PPCL,Panchthar Power Company Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+PPL,Peoples Power Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+PRIN,Prabhu Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+PROFL,Progressive Finance Limited,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+PRSF,Prabhu Capital Limited,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+PRVU,Prabhu  Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+PSF,Prabhu  Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+PURE,Pure Energy Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+RADHI,Radhi Bidyut Company Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RAWA,Rawa Energy Development Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RBBD2088,Rastriya Banijya Bank,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+RBBF40,RBB Merchant Banking Limited,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+RBCL,Rastriya Beema Company Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+RBCLPO,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+RFPL,River Falls power Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RHGCL,Rapti Hydro and General Construction Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RHPC,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+RHPL,Rasuwagadhi Hydropower Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RIDI,Ridi Power Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RLEL,RIDGE LINE ENERGY LIMITED,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+RLFL,Reliance Finance Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+RLI,Reliance Life Insurance Limited,Life Insurance,Equity,D,agent4_insurance,high,both sources agree
+RMF1,RBB Merchant Banking Limited,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+RMF2,RBB Merchant Banking Limited,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+RNLI,Reliable Nepal Life Insurance Ltd,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+RRHP,Rairang Hydropower Development Company Ltd.,Hydro Power,Equity,D,agent3_hydropower,high,both sources agree
+RSDC,RSDC Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+RSML,Reliance Spinning Mills Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+RSY,Reliable Nepal Life Insurance Ltd,Life Insurance,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+RURU,Ru Ru Jalbidhyut  Pariyojana Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SABBL,Salapa Bikas Bank Limited,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+SADBL,SHANGRI-LA DEVELOPMENT BANK LIMITED,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+SAGAR,Sagar Distillery Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+SAGF,Sanima Growth Fund,Mutual Fund,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SAHAS,Sahas Urja Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SAIL,SHREENAGAR AGRITECH INDUSTRIES LIMITED,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+SALICO,Sagarmatha Lumbini Insurance Co. Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SANIMA,Sanima Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+SANVI,Sanvi Energy Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SAPDBL,Saptakoshi Development bank Ltd,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+SARBTM,Sarbottam Cement Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+SBCF,Sunrise Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SBD89,Sanima Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+SBI,Nepal SBI Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+SBID89,Nepal SBI Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+SBL,Siddhartha Bank Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+SBLD2091,Siddhartha Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+SBLD89,Siddhartha Bank Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+SCB,Standard Chartered Bank  Nepal Limited,Commercial Banks,Equity,A,agent1_commercial_banks,high,both sources agree
+SCBD,Standard Chartered Bank  Nepal Limited,Commercial Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+SEF,Siddhartha Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SFCL,Samriddhi Finance Company Limited,Finance,Equity,D,agent2_devbank_finance,high,both sources agree
+SFEF,Sunrise Capital Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SFMF,Laxmi Sunrise Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SGHC,Swet-Ganga Hydropower and Construction Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SGIC,Sanima GIC Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SHBL,Sahara Bikas Bank Ltd.,Development Banks,Equity,D,agent2_devbank_finance,high,both sources agree
+SHEL,Singati Hydro Energy Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SHINE,SHINE RESUNGA DEVELOPMENT BANK LTD,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+SHINED,SHINE RESUNGA DEVELOPMENT BANK LTD,Development Banks,Non-Convertible Debentures,A,excluded_non_equity,high,both sources agree
+SHIVM,Shivam Cements Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+SHL,Soaltee Hotel Limited,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+SHLB,Shrijanshil Laghubitta Baittiya sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SHPC,Sanima Mai Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SICL,Shikhar Insurance Co. Ltd.,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SIFC,Shree Investment Finance Co. Ltd.,Finance,Equity,A,agent2_devbank_finance,high,both sources agree
+SIGS2,Siddhartha Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SIGS3,Siddhartha Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SIKLES,Sikles Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SINDU,Sindhu Bikash Bank Ltd,Development Banks,Equity,A,agent2_devbank_finance,high,both sources agree
+SIPD,Shikhar Power Development Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SJCL,SANJEN JALAVIDHYUT COMPANY LTD,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SJLIC,SuryaJyoti Life Insurance Company Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SKBBL,Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SKHEL,Suryakunda Hydro Electric Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SKHL,Super Khudi Hydropower Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SLBBL,Swarojgar Laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SLBBLP,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+SLBSL,Samudayik Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SLCF,Sanima Bank Limited,Commercial Banks,Mutual Funds,A,agent5_other_sectors,high,both sources agree
+SLI,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+SLICL,,Unclassified,,,unclassified,none,not in either source (possibly delisted/merged or promoter share)
+SMATA,Samata Gharelu Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SMB,Support Lagubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SMFBS,Swabhumaan Laghubitta Bittiya Sanstha Ltd,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SMH,Supermai Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SMHL,Super Madi Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SMJC,Sagarmatha Jalabidhyut Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SMPDA,Sampada Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SNLI,Sun Nepal Life Insurance Company Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SNORL,Snow Rivers Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SOHL,Solu Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SONA,Sonapur Minerals And Oil Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+SOPL,Sopan Pharmaceuticals Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+SPC,Samling power company limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SPDL,Synergy Power Development Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SPHL,Sayapatri Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SPIL,Siddhartha Premier Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SPL,SHUVAM POWER LIMITED,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+SRBL,Sunrise Bank Limited,Commercial Banks,Equity,D,agent1_commercial_banks,high,both sources agree
+SRLI,Sanima Reliance Life Insurance Limited,Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+SSHL,Shiva Shree Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+STC,Salt Trading Corporation,Tradings,Equity,A,agent5_other_sectors,high,both sources agree
+SWASTIK,SWASTIK LAGHUBITTA BITTIYA SANSTHA LTD.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SWBBL,Swabalamban Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SWMF,Suryodaya Womi Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+SYPNL,SY PANEL NEPAL LIMITED,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+TAMOR,Sanima Middle Tamor Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+TPC,Terhathum Power Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+TPKHL,Taksar Pikhuwa Khola Hydropower Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+TRH,Taragaon Regency Hotel Limited,Hotels And Tourism,Equity,A,agent5_other_sectors,high,both sources agree
+TSHL,Three Star Hydropower Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+TTL,Trade Tower Limited,Others,Equity,A,agent5_other_sectors,high,both sources agree
+TVCL,Trishuli Jal Vidhyut Company Limited ,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+UAIL,United Ajod Insurance Limited,Non Life Insurance,Equity,A,agent4_insurance,high,both sources agree
+UHEWA,Upper Hewakhola Hydropower company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+ULBSL,Upakar Laghubitta Bittiya  Sanstha  Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+ULHC,Upper Lohore Khola Hydropower Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+ULI,UnionLife Insurance Co. Ltd.,Life Insurance,Equity,D,agent4_insurance,high,both sources agree
+UMHL,United Modi Hydropower Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+UMRH,United Idi Mardi & RB Hydropower Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+UNHPL,Union Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+UNL,Unilever Nepal Limited,Manufacturing And Processing,Equity,A,agent5_other_sectors,high,both sources agree
+UNLB,Unique Nepal Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+UPCL,Universal Power Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+UPPER,Upper Tamakoshi Hydropower Ltd,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+USHEC,Upper solu Electric company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+USHL, Upper Syange Hydropower Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+USLB,Unnati Sahakarya Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+VLBS,Vijaya laghubitta Bittiya Sanstha Ltd.,Microfinance,Equity,A,agent5_other_sectors,high,both sources agree
+VLUCL,Vision Lumbini Urja Company Limited,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree
+WNLB,Wean Nepal Laghubitta Bittiya Sanstha Limited,Microfinance,Equity,S,agent5_other_sectors,high,both sources agree
+YMHL,Yambaling Hydropower Ltd.,Hydro Power,Equity,A,agent3_hydropower,high,both sources agree

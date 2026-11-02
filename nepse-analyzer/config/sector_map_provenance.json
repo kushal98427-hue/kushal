@@ -1,0 +1,24 @@
+{
+  "built_at_utc": "2026-11-02T09:31:38+00:00",
+  "source_a": {
+    "url": "https://raw.githubusercontent.com/Shubhamnpk/yonepse/HEAD/data/other/securities.json",
+    "sha256": "2b854468d5164fff5704843a30a534b3ed96d46f53a5e65b85abad9d6b180c41",
+    "records": 650
+  },
+  "source_b": {
+    "url": "https://raw.githubusercontent.com/coprashant/DasKitta/HEAD/backend/data/nepse/company-sectors.json",
+    "sha256": "a8b3331025c959249035029462fdda49d83b7fe4e1cd4e746039e25226a06fce",
+    "records": 648,
+    "source_updated_at": "2026-09-08T05:57:46.519393769Z"
+  },
+  "rule": "classified only if source A sectorName == source B sector and A has instrumentType",
+  "counts": {
+    "agent5_other_sectors": 133,
+    "agent1_commercial_banks": 26,
+    "agent3_hydropower": 109,
+    "agent4_insurance": 31,
+    "agent2_devbank_finance": 35,
+    "excluded_non_equity": 26,
+    "unclassified": 12
+  }
+}

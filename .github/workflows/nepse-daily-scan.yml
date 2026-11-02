@@ -1,0 +1,137 @@
+name: NEPSE daily technical scan
+
+# 21:00 Korea time (Asia/Seoul, UTC+9) = 12:00 UTC.
+# Korea has no daylight-saving time (and GitHub cron is always UTC), so this
+# is 21:00 KST all year. GitHub may start scheduled jobs a few minutes late.
+# Note: the source repo (Aabishkar2/nepse-data) updates 13:00-17:00 UTC, so a
+# 12:00 UTC run analyses the PREVIOUS trading session. The report always prints
+# the exact data date.
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      run_backtest:
+        description: "Also re-run the historical backtest (takes ~2-5 min)"
+        type: boolean
+        default: false
+      symbols:
+        description: "Optional comma-separated subset of symbols (blank = all)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write # only to push generated reports to the nepse-reports branch
+
+concurrency:
+  group: nepse-daily-scan
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: nepse-analyzer
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: nepse-analyzer/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: python -m pytest -q
+
+      - name: Restore CSV download cache
+        uses: actions/cache@v4
+        with:
+          path: nepse-analyzer/.cache/nepse-data
+          key: nepse-csv-${{ github.run_id }}
+          restore-keys: nepse-csv-
+
+      - name: Restore previous backtest from nepse-reports branch
+        run: |
+          mkdir -p reports/backtest
+          if git ls-remote --exit-code --heads origin nepse-reports >/dev/null 2>&1; then
+            git fetch --depth=1 origin nepse-reports
+            git show FETCH_HEAD:reports/backtest/latest.json > reports/backtest/latest.json 2>/dev/null \
+              || rm -f reports/backtest/latest.json
+          fi
+          ls -la reports/backtest || true
+
+      - name: Backtest (on request, every Saturday UTC, or when no previous result exists)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RUN_BACKTEST: ${{ inputs.run_backtest }}
+        run: |
+          if [ "$RUN_BACKTEST" = "true" ] || [ "$(date -u +%u)" = "6" ] || [ ! -f reports/backtest/latest.json ]; then
+            python -m nepse_ta backtest
+          else
+            echo "Using previous backtest result."
+          fi
+
+      - name: Daily scan
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # higher GitHub API rate limit for listing source files
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }} # optional; scan works without it
+          SYMBOLS: ${{ inputs.symbols }}
+        run: |
+          ARGS=""
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            pip install "anthropic>=1.0"
+            ARGS="--narrative"
+          fi
+          if [ -n "$SYMBOLS" ]; then
+            if [[ ! "$SYMBOLS" =~ ^[A-Za-z0-9,]+$ ]]; then echo "Invalid symbols input"; exit 1; fi
+            ARGS="$ARGS --symbols $SYMBOLS"
+          fi
+          python -m nepse_ta scan $ARGS
+
+      - name: Upload reports artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nepse-reports-${{ github.run_number }}
+          path: nepse-analyzer/reports
+          retention-days: 30
+
+      - name: Commit reports to nepse-reports branch
+        # A separate branch keeps daily commits out of the main branch (and avoids
+        # triggering a Netlify production build of the app every day).
+        run: |
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          DIR="$RUNNER_TEMP/reports-branch"
+          if git ls-remote --exit-code --heads origin nepse-reports >/dev/null 2>&1; then
+            git fetch --depth=1 origin nepse-reports
+            git worktree add --detach "$DIR" FETCH_HEAD
+          else
+            git worktree add --detach "$DIR"
+            git -C "$DIR" checkout --orphan nepse-reports-new
+            git -C "$DIR" rm -rf -q --ignore-unmatch .
+            find "$DIR" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +   # orphan branch holds reports only
+          fi
+          mkdir -p "$DIR/reports"
+          for d in reports/*/; do
+            name=$(basename "$d")
+            rm -rf "$DIR/reports/$name"     # replace same-date / latest / backtest folders only
+            cp -r "$d" "$DIR/reports/$name"
+          done
+          cd "$DIR"
+          git add reports
+          if git diff --cached --quiet; then
+            echo "No report changes."
+          else
+            git commit -q -m "NEPSE reports $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin HEAD:refs/heads/nepse-reports
+          fi
