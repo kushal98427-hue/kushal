@@ -336,7 +336,7 @@ def backtest_section(res: ScanResult) -> list[str]:
     out += [
         f"- अवधि {period.get('start')} → {period.get('end')}, {bt.get('symbols_tested')} स्टक, लागत (कमिसन, SEBON, DP, स्लिपेज, CGT) सहित।",
         f"- **मास्टर मापदण्डका सेटअप:** {e.get('trades', 0)} ट्रेड · जित दर {e.get('win_rate_pct')}% · "
-        f"T1 हिट {e.get('t1_hit_rate_pct')}% · औसत नेट प्रतिफल {e.get('avg_net_return_pct')}% · expectancy {e.get('expectancy_r')}R · "
+        f"T1 हिट {e.get('t1_hit_rate_pct')}% · औसत नेट प्रतिफल {e.get('avg_return_pct')}% · expectancy {e.get('expectancy_r')}R · "
         f"profit factor {e.get('profit_factor')}",
         f"- सबै सेटअप: {a.get('trades')} ट्रेड · expectancy {a.get('expectancy_r')}R · profit factor {a.get('profit_factor')}",
         f"- Walk-forward calibration: {'पास' if bt.get('calibrated') else 'पास भएन'} "

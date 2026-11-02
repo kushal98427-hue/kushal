@@ -13,7 +13,7 @@ def _row(name: str, s: dict) -> str:
     ci = s.get("t1_hit_rate_ci95") or ("—", "—")
     return (
         f"| {name} | {s['trades']} | {s['win_rate_pct']}% | {s['t1_hit_rate_pct']}% ({ci[0]}–{ci[1]}) | "
-        f"{s['avg_net_return_pct']}% | {s['expectancy_r']} | {s.get('profit_factor') or '—'} | "
+        f"{s['avg_return_pct']}% | {s['expectancy_r']} | {s.get('profit_factor') or '—'} | "
         f"{s['max_drawdown_r']}R |"
     )
 

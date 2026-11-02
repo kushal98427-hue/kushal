@@ -182,3 +182,21 @@ def test_portfolio_respects_slots():
     res = simulate_portfolio(pd.DataFrame(rows), NO_COST, slots=2)
     assert res["trades_taken"] == 2 and res["signals_skipped_no_capital"] == 3
     assert res["total_return_pct"] == pytest.approx(10.0)
+
+
+def test_backtest_markdown_and_report_section_render(tmp_path):
+    """Guards against summary-key drift between summarize() and the report writers."""
+    from nepse_ta.reports.backtest_md import write_backtest_md
+
+    t = _trades({2021: 0.5, 2022: 0.4, 2023: 0.45})
+    t["setup_type"] = "breakout"
+    s = summarize(t)
+    result = {
+        "summary_all": s, "summary_eligible_rule": s, "by_setup_type": {"breakout": s},
+        "by_bucket": {}, "walk_forward": walk_forward(t, BacktestConfig()), "calibrated": False,
+        "period": {"start": "2021", "end": "2023"}, "symbols_tested": 1, "rules": "x",
+    }
+    out = tmp_path / "bt.md"
+    write_backtest_md(result, out)
+    text = out.read_text(encoding="utf-8")
+    assert "None" not in text and f"{s['avg_return_pct']}%" in text

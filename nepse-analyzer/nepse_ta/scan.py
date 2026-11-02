@@ -193,7 +193,9 @@ def _set_eligibility(a: StockAnalysis, settings: Settings, freshness: str) -> No
     reasons = []
     if a.plan.plan_type not in SETUP_TYPES:
         reasons.append("सक्रिय सेटअप छैन")
-    if a.plan.rr1 is None or a.plan.rr1 < acfg.min_rr_for_valid_setup:
+    if a.plan.rr1 is None:
+        reasons.append("R:R गणना हुन सकेन (योजना छैन)")
+    elif a.plan.rr1 < acfg.min_rr_for_valid_setup:
         reasons.append(f"R:R {a.plan.rr1} < {acfg.min_rr_for_valid_setup}")
     if a.score < acfg.min_score_for_master:
         reasons.append(f"स्कोर {a.score} < {acfg.min_score_for_master}")
