@@ -23,7 +23,11 @@ HOLDOUT_START = "2025-01-01"
 
 # --------------------------------------------------------------------------- regimes
 def equal_weight_index(files: dict[str, Path], dcfg, min_stocks: int = 50) -> pd.Series:
-    """Median daily return across equities -> cumulative index (proxy; NOT the official NEPSE index)."""
+    """Equal-weight mean daily return (clipped to +/-10%) -> cumulative index.
+
+    Proxy only, NOT the official NEPSE index. (A median-of-returns index was tried first and
+    rejected: compounding the median return has a strong negative drift bias.)
+    """
     rets = []
     for sym, p in files.items():
         try:
@@ -36,8 +40,8 @@ def equal_weight_index(files: dict[str, Path], dcfg, min_stocks: int = 50) -> pd
         rets.append(r.rename(sym))
     panel = pd.concat(rets, axis=1)
     count = panel.notna().sum(axis=1)
-    med = panel.median(axis=1).where(count >= min_stocks).dropna()
-    return (1 + med).cumprod().rename("ew_index")
+    mean = panel.clip(-0.10, 0.10).mean(axis=1).where(count >= min_stocks).dropna()
+    return (1 + mean).cumprod().rename("ew_index")
 
 
 def classify_regimes(index: pd.Series) -> pd.Series:

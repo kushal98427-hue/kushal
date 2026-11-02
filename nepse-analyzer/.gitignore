@@ -4,4 +4,4 @@ __pycache__/
 .pytest_cache/
 # Daily reports are published to the `nepse-reports` branch and as workflow artifacts,
 # not committed to the main branch. A real-data sample lives in sample-output/.
-reports/
+/reports/

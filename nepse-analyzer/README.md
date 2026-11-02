@@ -62,7 +62,7 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 # 3. Install libraries
 pip install -r requirements.txt
 
-# 4. Run the tests (should print "40 passed")
+# 4. Run the tests (should print "56 passed")
 python -m pytest -q
 
 # 5. Run a real scan (downloads ~40 MB the first time, then only changed files)
@@ -168,14 +168,14 @@ Default model `claude-opus-5-5` (override with env `NEPSE_LLM_MODEL`).
 * Survivorship bias: delisted companies present in the source repo are included; companies the repo
   never had cannot be.
 
-**Result on real data (2019-01 → 2026-10, 346 stocks, 12,307 trades):** calibration passed
-(5.2 pp OOS error), but the average result after costs is negative for all setups
-(−0.16 R) and about break-even for master-list setups (−0.014 R, profit factor 0.95, 2,153 trades).
-Higher scores do have better expectancy (−0.38 R → −0.04 R). Full table: `sample-output/backtest_np.md`.
+**Result on real data (audited — see [docs/BACKTEST_AUDIT.md](docs/BACKTEST_AUDIT.md)):** 12,349 trades,
+2019-01 → 2026-10. Before costs: all setups +0.13R, master list +0.24R. After costs: all setups **−0.16R**,
+master list **−0.02R** (95 % CI −0.20…+0.16). A 10-slot capital-constrained portfolio of master-list
+trades: **−33.5 %** total, max drawdown **−64.6 %**. The untouched 2025–2026 holdout is the worst period.
 
 ## Tests
 
-`python -m pytest -q` — 40 tests covering indicators (vs. reference RSI, causality), data validation
+`python -m pytest -q` — 56 tests covering indicators (vs. reference RSI, causality), data validation
 (duplicates, malformed rows, OHLC repair, bonus adjustment, breaks), scoring, backtest mechanics
 (stop-first, gap fills, T+2 lock, costs, walk-forward, no look-ahead) and an end-to-end scan.
 
