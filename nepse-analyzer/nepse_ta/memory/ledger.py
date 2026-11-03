@@ -264,13 +264,15 @@ def created_event(analysis_record: dict, run_id: str) -> dict:
     }
 
 
-def summarize_ledger(states: dict[str, RecState], mode: str = "live") -> dict:
+def summarize_ledger(states: dict[str, RecState], mode: str = "live", strategy_version: str | None = None) -> dict:
     """Paper-trading performance (separate from backtest and from user trades).
 
     Only recommendations of ``mode`` are counted; events written before the ``mode``
     field existed are treated as live (they were produced by the live workflow).
     """
     states = {k: v for k, v in states.items() if v.created.get("mode", "live") == mode}
+    if strategy_version is not None:  # v1.0 and v2.0 paper-tracking are never mixed
+        states = {k: v for k, v in states.items() if v.created.get("strategy_version") == strategy_version}
     closed = [s for s in states.values() if s.status == "closed"]
     rs = [s.outcome_events[-1]["realized_r"] for s in closed if s.outcome_events[-1].get("realized_r") is not None]
     wins = [r for r in rs if r > 0]
@@ -278,7 +280,8 @@ def summarize_ledger(states: dict[str, RecState], mode: str = "live") -> dict:
     for s in states.values():
         by_status[s.status] = by_status.get(s.status, 0) + 1
     return {
-        "label": f"paper-trading [{mode}] (system recommendations, hypothetical fills)",
+        "label": f"paper-trading [{mode}] [{strategy_version or 'all versions'}] (system recommendations, hypothetical fills)",
+        "strategy_version": strategy_version,
         "recommendations": len(states),
         "triggered": sum(s.triggered for s in states.values()),
         "by_status": by_status,

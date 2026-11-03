@@ -39,6 +39,7 @@ from nepse_ta.memory.records import (
 )
 from nepse_ta.memory.store import StateStore
 from nepse_ta.scan import ScanResult
+from nepse_ta.smc import smc_snapshot
 
 PREVIOUS_LOOKBACK_DATES = 15
 
@@ -130,9 +131,20 @@ def update_memory(
     prev_cache: dict[str, dict[str, dict]] = {}
     stored_now: dict[str, dict] = {}
 
+    series_cache: dict[str, object] = {}
+
+    def series_of(sym: str):
+        if sym not in series_cache:
+            path = files.get(sym)
+            try:
+                series_cache[sym] = prepare_series(sym, path, DEFAULT_SETTINGS.data) if path else None
+            except Exception:  # noqa: BLE001 - reported as unavailable
+                series_cache[sym] = None
+        return series_cache[sym]
+
     for a in res.analyses + res.unclassified:
         earlier_open = {sym for sym, d0 in active_before if d0 < a.date}
-        content = build_content(a, classify(a, watch, earlier_open))
+        content = build_content(a, classify(a, watch, earlier_open), smc=_smc_for(a, series_of(a.symbol)))
         rid = record_id(content)
         d = a.date
         if d not in date_cache:
@@ -233,21 +245,15 @@ def update_memory(
 
     # ---- outcomes for every non-terminal recommendation ---------------------
     out_rows: list[dict] = []
-    series_cache: dict[str, object] = {}
     for st in states.values():
         if st.status not in ("pending", "open"):
             continue
         sym = st.created["symbol"]
-        path = files.get(sym)
-        if path is None:
-            continue  # no data this run; try again next run
-        if sym not in series_cache:
-            try:
-                series_cache[sym] = prepare_series(sym, path, DEFAULT_SETTINGS.data)
-            except Exception as exc:  # noqa: BLE001
-                summ.notes.append(f"{sym}: outcome not evaluated ({exc})")
-                continue
-        computed = L.evaluate(st.plan_event, series_cache[sym].df, exec_cfg)  # type: ignore[attr-defined]
+        series = series_of(sym)
+        if series is None:
+            summ.notes.append(f"{sym}: outcome not evaluated (no data this run)")
+            continue
+        computed = L.evaluate(st.plan_event, series.df, exec_cfg)  # type: ignore[attr-defined]
         for ev in L.new_outcome_events(st, computed):
             out_rows.append({**stamp, "rec_id": st.rec_id, **ev})
     summ.rec_events = store.recommendations.append(out_rows) + len(rec_new) - summ.recs_created
@@ -275,3 +281,16 @@ def update_memory(
         ]
     )
     return summ
+
+
+def _smc_for(a, series) -> dict:
+    """smc-1 section for the stock's own trading date, or an explicit 'unavailable'."""
+    if series is None:
+        return {"status": "unavailable", "reason": "price series could not be loaded"}
+    live = series.live
+    if not len(live) or live.index[-1].strftime("%Y-%m-%d") != a.date:
+        return {"status": "unavailable", "reason": "series date does not match the analysis date"}
+    try:
+        return smc_snapshot(live)
+    except Exception as exc:  # noqa: BLE001 - never block the memory update
+        return {"status": "unavailable", "reason": f"smc error: {type(exc).__name__}"}

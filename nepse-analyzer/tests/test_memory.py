@@ -291,7 +291,9 @@ def test_records_store_required_fields(tmp_path):
     for k in ("price", "volume", "technical", "smc", "events", "plan", "thesis", "confirmation_conditions",
               "invalidation_conditions", "strategy_version", "classification"):
         assert k in c
-    assert c["smc"]["status"] == "not_available" and c["events"]["status"] == "not_available"
+    assert c["analysis_version"] == "smc-1" and c["smc"]["status"] in ("ok", "insufficient_history")
+    assert c["smc"]["kind"].startswith("OHLCV-based") if c["smc"]["status"] == "ok" else True
+    assert c["events"]["status"] == "not_available"  # Phase 5
     json.dumps(rec)  # serialisable
 
 
@@ -317,3 +319,59 @@ def test_plan_change_rules():
     assert diff_fields(watch, {**watch, "stop": 95.5}) == []  # 0.5% ATR jitter
     assert diff_fields(watch, {**watch, "stop": 93.0}) == ["stop"]  # 2% move
     assert diff_fields(watch, {**watch, "plan_type": "breakout"}) == ["plan_type"]
+
+
+
+def test_analysis_version_upgrade_makes_exactly_one_revision(tmp_path, monkeypatch):
+    from nepse_ta.memory import records as R
+    from nepse_ta.memory import update as U
+
+    d, sm = _universe(tmp_path)
+    store = StateStore(tmp_path / "state")
+    last = make_ohlc(n=320).index[-1]
+    # 1) records written by the Phase 1 code: no smc, no analysis_version
+    orig_build = R.build_content
+
+    def phase1_build(a, classification, smc=None):
+        c = orig_build(a, classification, smc=None)
+        c.pop("analysis_version")
+        c["smc"] = {"status": "not_available", "reason": "SMC module not implemented yet (Phase 2)"}
+        return c
+
+    monkeypatch.setattr(U, "build_content", phase1_build)
+    _run(d, sm, store, _now_for(last))
+    monkeypatch.setattr(U, "build_content", orig_build)
+    # 2) Phase 2 code on the same data: one revision per stock, reason names the version change
+    _, s2 = _run(d, sm, store, _now_for(last) + dt.timedelta(hours=1))
+    assert s2.revised == 3 and s2.new == 0
+    rows = [r for r in store.analyses(str(last.date())).read() if r["symbol"] == "AAA"]
+    assert [r["revision"] for r in rows] == [0, 1]
+    assert "analysis_version_changed (v1-only → smc-1)" in rows[1]["revision_reason"]
+    # 3) duplicate runs after that: nothing new
+    _, s3 = _run(d, sm, store, _now_for(last) + dt.timedelta(hours=2))
+    assert s3.revised == 0 and s3.duplicate == 3
+
+
+def test_smc_does_not_change_v1_plan_or_recommendations(tmp_path):
+    from nepse_ta.memory.records import build_content
+
+    d, sm = _universe(tmp_path)
+    last = make_ohlc(n=320).index[-1]
+    res = run_scan(load_from_local_dir(d), sm, now_utc=_now_for(last))
+    for a in res.analyses:
+        with_smc = build_content(a, "D_avoid_no_trade", smc={"status": "ok", "x": 1})
+        without = build_content(a, "D_avoid_no_trade", smc=None)
+        for k in ("plan", "eligible", "ineligible_reasons", "score", "classification", "strategy_version"):
+            assert with_smc[k] == without[k]
+        assert with_smc["strategy_version"] == "v1.0"
+
+
+def test_v1_and_v2_paper_tracking_are_separate():
+    rows = [
+        {"rec_id": "A", "type": "created", "mode": "live", "strategy_version": "v1.0", **REC},
+        {"rec_id": "B", "type": "created", "mode": "live", "strategy_version": "v2.0", **REC},
+    ]
+    st = L.replay(rows)
+    assert L.summarize_ledger(st, strategy_version="v1.0")["recommendations"] == 1
+    assert L.summarize_ledger(st, strategy_version="v2.0")["recommendations"] == 1
+    assert "v1.0" in L.summarize_ledger(st, strategy_version="v1.0")["label"]

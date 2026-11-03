@@ -1,7 +1,11 @@
 # Phase 2 specification — Market Structure र SMC (v2, review को लागि)
 
-स्थिति: **प्रस्ताव मात्र — implementation सुरु भएको छैन।** Branch: `nepse-v2`. Version label: `smc-1`.
-सबै parameter तलको तालिकामा छन्; approval पछि मात्र code लेखिनेछ।
+स्थिति: **2026-11-03 मा approve भयो (clarification सहित)।** Branch: `nepse-v2`. Version label: `smc-1`.
+
+> **Pre-registered rules.** §2 का parameter हरू data हेरेर tune गरिएका होइनन् र नाफामूलक भनेर प्रमाणित पनि
+> छैनन्। Phase 2 मा कुनै tuning हुँदैन; कुनै परिवर्तन भए नयाँ version (`smc-2`) बन्छ र Phase 7 मा परीक्षण हुन्छ।
+> Output **OHLCV-based price-structure interpretation** मात्र हो — institutional order, "smart money activity"
+> वा वास्तविक stop order देखिएको दाबी होइन।
 
 ---
 
@@ -145,6 +149,8 @@ ATR = ATR(14) at the relevant bar. सबै तुलना adjusted price म�
   zone bottom) / `invalidated` (bullish: close < zone bottom)।
 * **Flags:** `circuit_move` (i−1 वा i मा ±9.5 %+), `long_gap` (i−2 र i बीच > 5 calendar दिन — बिदा/halt)।
   Flag भएको FVG entry/target मा प्रयोग गर्दा report ले चेतावनी दिन्छ।
+* **Expiry:** बनेको 120 bar पछि `expired` (OB सँग उही नियम)। Equal highs/lows zone पनि 120 bar पछि `expired`।
+  BOS/CHoCH को failure जाँच break पछि 240 bar सम्म मात्र।
 * **Relevance:** structure (BOS/CHoCH leg भित्र), OB/EQ zone सँग overlap → `confluence`।
 
 ### 3.9 Premium / discount
@@ -164,6 +170,59 @@ ATR = ATR(14) at the relevant bar. सबै तुलना adjusted price म�
 * Break bar rel. volume (≥ 1.5 supported, ≥ 3 abnormal)।
 * 20-bar up-day volume ÷ down-day volume: > 1.5 → "accumulation-like (up-day volume dominance)",
   < 0.67 → "distribution-like"; बीचमा neutral। (Buy/sell volume छुट्याउन नसकिने भएकाले यति मात्र।)
+
+### 3.12 Bullish ↔ bearish symmetry (exact)
+
+सबै rule पूर्ण रूपमा mirror छन् — high↔low, `>`↔`<`, माथि↔तल।
+
+| | Bullish | Bearish |
+|---|---|---|
+| **BOS** | state = bullish (अन्तिम swing high HH, अन्तिम swing low HL); bar *j* को `close > H*` जहाँ H* = अन्तिम accepted swing high (formed_at < j), H* पहिले close ले नतोडिएको | state = bearish (LH + LL); `close < L*` जहाँ L* = अन्तिम accepted swing low (formed_at < j), पहिले नतोडिएको |
+| BOS wick-only | `high > H*`, `close ≤ H*` → buy-side sweep candidate | `low < L*`, `close ≥ L*` → sell-side sweep candidate |
+| BOS failure | पछि `close < H* − 0.5 ATR` → `failed_bos` | पछि `close > L* + 0.5 ATR` → `failed_bos` |
+| **CHoCH broken level** | state = bearish हुँदा अन्तिम accepted swing high (= सबैभन्दा पछिल्लो **LH**) माथि close | state = bullish हुँदा अन्तिम accepted swing low (= सबैभन्दा पछिल्लो **HL**) तल close |
+| CHoCH origin (invalidation) | अन्तिम accepted swing low (= पछिल्लो **LL**); `close < origin` → `failed_choch` | अन्तिम accepted swing high (= पछिल्लो **HH**); `close > origin` → `failed_choch` |
+| CHoCH structure_confirmed | CHoCH पछि पहिलो accepted swing low > origin | CHoCH पछि पहिलो accepted swing high < origin |
+| MSS-like | CHoCH + strong displacement | उही |
+| Range break | state transition/insufficient हुँदा H* माथि close → `range_break` (CHoCH/BOS होइन) | L* तल close → `range_break` |
+| **OB selection** | bullish BOS/CHoCH bar *j* जसले swing high H* (bar *h*) तोड्यो: leg origin *L* = bars max(h+1, j−10)..j मा न्यूनतम low (बराबर भए पछिल्लो); OB = L, L−1, L−2, L−3 मध्ये पछिल्लो **bearish** candle (close < open) | bearish BOS/CHoCH bar *j* जसले swing low L* (bar *b*) तोड्यो: leg origin *H* = bars max(b+1, j−10)..j मा अधिकतम high; OB = H, H−1, H−2, H−3 मध्ये पछिल्लो **bullish** candle |
+| OB displacement | `close[j] − low[OB] ≥ 2 ATR[j]` | `high[OB] − close[j] ≥ 2 ATR[j]` |
+| OB zone | primary = [low, high]; body = [close, open] छुट्टै | primary = [low, high]; body = [open, close] छुट्टै |
+| OB tested | j पछि कुनै bar को `low ≤ zone high` र `close ≥ zone low` | `high ≥ zone low` र `close ≤ zone high` |
+| OB invalidated | `close < zone low` | `close > zone high` |
+| OB expiry | j पछि 120 bar | उही |
+| **FVG** | `low[i] > high[i−2]`, zone [high[i−2], low[i]]; filled: low ≤ bottom; invalidated: close < bottom | `high[i] < low[i−2]`, zone [high[i], low[i−2]]; filled: high ≥ top; invalidated: close > top |
+| Sweep | sell-side: `low ≤ level − 0.1 ATR` र `close > level`; reaction: 3 bar भित्र close > sweep bar high | buy-side: `high ≥ level + 0.1 ATR` र `close < level`; reaction: 3 bar भित्र close < sweep bar low |
+| Premium/discount | leg: origin swing low → त्यसपछिको उच्चतम high (BOS/CHoCH पछि confirmed swing high हुनुपर्छ) | leg: origin swing high → त्यसपछिको न्यूनतम low (confirmed swing low हुनुपर्छ) |
+
+> **Implementation-time clarification (2026-11-03, before any results were seen):** approve भएको text मा leg origin
+> "j−10..j मा न्यूनतम low" थियो। Unit test मा देखियो कि uptrend मा pullback low (HL) अघिल्लो low भन्दा माथि हुने
+> भएकाले त्यो window ले break गर्ने leg भन्दा **पहिलेको** low छान्छ — गलत (पुरानो) candle OB बन्छ। त्यसैले leg लाई
+> तोडिएको swing पछि मात्र सीमित गरियो (माथिको row)। यो logic सुधार हो, data/performance हेरेर गरिएको tuning होइन।
+
+### 3.13 एउटै candle मा धेरै / विरोधी signal
+
+हरेक bar *t* निम्न **निश्चित क्रम**मा process हुन्छ (bars ≤ t मात्र):
+1. पहिले बनेका element को status update (OB tested/invalidated/expired, FVG fill, sweep reaction, BOS/CHoCH failure)।
+2. **अघिल्लो bar को अन्त्यसम्मका** reference level (H*, L*, liquidity) विरुद्ध break र sweep जाँच।
+   (त्यसैले कुनै bar ले आफैँले confirm गराएको swing तोड्न सक्दैन।)
+3. Break भए OB खोज; 4. नयाँ FVG; 5. bar t−k को swing candidate confirm (अर्को bar देखि मात्र reference)।
+
+Conflict नियम:
+* एउटा bar ले एक side मा एउटा मात्र structure break (close ले निर्णय)।
+* Wick ले H* माथि गयो तर close L* तल → bearish break + buy-side sweep दुवै दर्ता, flag `two_sided`।
+  Close H* माथि र low L* तल (outside bar) → bullish break + sell-side sweep, flag `two_sided`।
+* Break र FVG एउटै bar मा → दुवै (स्वतन्त्र)। एउटै level मा break र sweep एकै bar मा सम्भव छैन (close ले छुट्याउँछ)।
+* **Circuit bar** (|close/prev close − 1| ≥ 9.5 %): त्यस bar बाट बनेको हरेक element मा `circuit_bar` flag।
+  High = low (एकै मूल्य) bar मा wick नहुने भएकाले sweep बन्दैन; FVG बने flag।
+* **Long gap** (अघिल्लो bar भन्दा > 5 calendar दिन): त्यस bar का element मा `long_gap`; FVG का तीन bar
+  बीच > 5 दिन भए `long_gap`।
+* **Repaired bar** (validation ले high/low मिलाएको): त्यस bar प्रयोग गर्ने swing/element मा `repaired_bar`।
+* Flag भएका element हटाइँदैनन्, तर explanation मा चेतावनी र Phase 6 मा कम महत्त्व।
+
+### 3.14 Weekly incomplete week (कार्यान्वयन नियम)
+Analysis date t मा, W-SAT हप्ता जसको अन्तिम दिन (शनिबार) t भन्दा पछि छ, त्यो **चालु/अपूर्ण हप्ता — सधैँ बाहिर**।
+(Trading day कहिल्यै शनिबार हुँदैन, त्यसैले चालु हप्ता कहिल्यै प्रयोग हुँदैन; शुक्रबार पनि एक हप्ता ढिलो — conservative।)
 
 ## 4. Look-ahead रोक्ने उपाय
 
@@ -200,8 +259,9 @@ Explanation वाक्य computed field बाट मात्र बन्�
 
 ## 7. Version र paper-tracking अलगाव
 * Phase 2 ले trade plan बदल्दैन: v1.0 recommendation rule जस्ताको तस्तै, `strategy_version: v1.0`।
-  Record मा `analysis_version: "smc-1"` थपिन्छ। (पहिलो पटक smc थपिँदा उही मितिको record मा एक पटक revision
-  बन्छ — कारण "analysis version changed" लेखिन्छ।)
+  Record मा `analysis_version: "smc-1"` थपिन्छ। पहिलो पटक smc थपिँदा उही मितिको record मा **एक** revision बन्छ,
+  reason मा `analysis_version_changed (v1-only → smc-1)`। Duplicate run वा code commit मात्र बदलिँदा revision
+  बन्दैन (code commit run metadata मा छ, hashed content मा होइन)।
 * v2.0 recommendation Phase 6 पछि मात्र; ledger र summary `strategy_version` अनुसार छुट्टै (mix हुँदैन) —
   `summarize_ledger(strategy_version=…)` र test।
 

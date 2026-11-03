@@ -13,6 +13,8 @@ from nepse_ta.config import STRATEGY_VERSION
 from nepse_ta.memory.store import content_hash
 
 SCHEMA_VERSION = 1
+#: Version of the analysis sections stored next to the (unchanged) v1.0 plan.
+ANALYSIS_VERSION = "smc-1"
 
 #: Fields of the plan that define "the trade plan" for change tracking.
 PLAN_FIELDS = ("plan_type", "entry_low", "entry_high", "stop", "target1", "target2", "classification")  # stored view
@@ -51,12 +53,13 @@ def confirmation_conditions(a: StockAnalysis) -> list[str]:
     return []
 
 
-def build_content(a: StockAnalysis, classification: str) -> dict:
+def build_content(a: StockAnalysis, classification: str, smc: dict | None = None) -> dict:
     """Everything the analysis says about the stock on its trading date (hashed)."""
     p = a.plan
     return {
         "schema": SCHEMA_VERSION,
         "strategy_version": STRATEGY_VERSION,
+        "analysis_version": ANALYSIS_VERSION,
         "symbol": a.symbol,
         "company_name": a.company_name,
         "sector": a.sector,
@@ -94,7 +97,8 @@ def build_content(a: StockAnalysis, classification: str) -> dict:
         },
         # Filled from Phase 2 / Phase 5. Explicitly marked so a reader never mistakes
         # "not analysed yet" for "nothing found".
-        "smc": {"status": "not_available", "reason": "SMC module not implemented yet (Phase 2)"},
+        # OHLCV-based price-structure interpretation (smc-1). Does not change the v1.0 plan below.
+        "smc": smc if smc is not None else {"status": "unavailable", "reason": "price series not available for SMC"},
         "events": {"status": "not_available", "reason": "event/corporate-action module not implemented yet (Phase 5)"},
         "plan": {
             "plan_type": p.plan_type,
@@ -183,6 +187,8 @@ def diff_fields(old: dict, new: dict) -> list[str]:
 def explain_change(prev: dict, cur: dict, same_date: bool) -> str:
     """Rule-based reason (facts only, no invented narrative)."""
     reasons = []
+    if prev.get("analysis_version") != cur.get("analysis_version"):
+        reasons.append(f"analysis_version_changed ({prev.get('analysis_version', 'v1-only')} → {cur.get('analysis_version')})")
     if same_date:
         reasons.append("same trading date re-analysed")
         if prev["strategy_version"] != cur["strategy_version"]:

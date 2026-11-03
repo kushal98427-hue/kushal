@@ -132,7 +132,9 @@ def cmd_v2_update(args: argparse.Namespace) -> int:
     out = asdict(summ)
     out["no_new_candle"] = len(summ.no_new_candle)
     out["failed"] = len(summ.failed)
-    out["ledger"] = summarize_ledger(replay(list(store.recommendations.read())))
+    states = replay(list(store.recommendations.read()))
+    versions = sorted({st.created.get("strategy_version") for st in states.values()} - {None})
+    out["ledger"] = {v: summarize_ledger(states, strategy_version=v) for v in versions}
     print(json.dumps(out, ensure_ascii=False, indent=1))
     return 0
 
