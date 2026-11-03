@@ -685,7 +685,8 @@ class Engine:
 def completed_weeks(df: pd.DataFrame) -> pd.DataFrame:
     """Weekly W-SAT bars from daily rows, excluding the week of the last row (always incomplete)."""
     agg = {"open": "first", "high": "max", "low": "min", "close": "last", "volume": "sum"}
-    empty = pd.DataFrame(columns=[*agg, "ohlc_repaired"], index=pd.DatetimeIndex([]))
+    empty = pd.DataFrame({**{k: pd.Series(dtype="float64") for k in agg}, "ohlc_repaired": pd.Series(dtype="bool")},
+                         index=pd.DatetimeIndex([]))
     if df.empty:
         return empty
     wk = df.index.to_period("W-SAT")

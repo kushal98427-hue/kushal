@@ -388,3 +388,6 @@ def test_completed_weeks_empty_shape_is_consistent():
     one_week = bars([(100, 101, 99, 100)] * 3, start="2025-02-04")  # Tue-Thu of one week
     a, b = completed_weeks(one_week), completed_weeks(one_week.iloc[:1])
     assert a.empty and b.empty and list(a.columns) == list(b.columns) and a.equals(b)
+    # an empty slice of a real weekly frame must compare equal too (same dtypes)
+    full = completed_weeks(bars(path([100, 110, 100, 110], n=10)))
+    assert full.iloc[:0].equals(a)

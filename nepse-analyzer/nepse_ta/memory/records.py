@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from nepse_ta.analysis import SETUP_TYPES, StockAnalysis
 from nepse_ta.config import STRATEGY_VERSION
-from nepse_ta.memory.store import content_hash
+from nepse_ta.memory.store import canonical, content_hash
 
 SCHEMA_VERSION = 1
 #: Version of the analysis sections stored next to the (unchanged) v1.0 plan.
@@ -124,11 +124,15 @@ def build_content(a: StockAnalysis, classification: str, smc: dict | None = None
         "score": {"value": a.score, "band": a.score_band, "breakdown": a.score_breakdown, "kind": "heuristic, not probability"},
         "classification": classification,
         "eligible": a.eligible,
-        "ineligible_reasons": a.ineligible_reasons,
+        # staleness-derived reasons change every day without new information → run context
+        "ineligible_reasons": [r for r in a.ineligible_reasons if r not in STALENESS_REASONS],
         # Stock-staleness warnings change every day ("N sessions behind") without any new
         # information about the stock, so they live in run context, not in hashed content.
         "warnings": [w for w in a.warnings if not _is_staleness_warning(w)],
     }
+
+
+STALENESS_REASONS = ("डाटा पुरानो", "बजार डाटा पुरानो")
 
 
 def _is_staleness_warning(w: str) -> bool:
@@ -137,7 +141,11 @@ def _is_staleness_warning(w: str) -> bool:
 
 def run_context(a: StockAnalysis) -> dict:
     """Per-run facts about a stock that are NOT part of its analysis content."""
-    return {"stale_stock": a.stale, "staleness_warnings": [w for w in a.warnings if _is_staleness_warning(w)]}
+    return {
+        "stale_stock": a.stale,
+        "staleness_warnings": [w for w in a.warnings if _is_staleness_warning(w)],
+        "staleness_ineligible_reasons": [r for r in a.ineligible_reasons if r in STALENESS_REASONS],
+    }
 
 
 def plan_view(content: dict) -> dict:
@@ -195,7 +203,8 @@ def explain_change(prev: dict, cur: dict, same_date: bool) -> str:
             reasons.append(f"strategy version {prev['strategy_version']} → {cur['strategy_version']}")
         if prev["price"] != cur["price"] or prev["volume"] != cur["volume"]:
             reasons.append("source price/volume data for this date changed")
-        sections = sorted(k for k in cur if prev.get(k) != cur.get(k))
+        # compare the hashed (canonical JSON) form: fresh content holds tuples, stored content lists
+        sections = sorted(k for k in cur if canonical(prev.get(k)) != canonical(cur.get(k)))
         reasons.append("changed sections: " + ", ".join(sections))
     else:
         reasons.append(f"new candle {cur['trading_date']} (previous analysis {prev['trading_date']})")

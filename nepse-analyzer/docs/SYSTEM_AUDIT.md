@@ -181,3 +181,65 @@ drop is not a loss. Data revisions append a `correction` event instead of editin
 * Actual user executions are not tracked (by design); a separate user-trade log can be added if wanted.
 * The hash chain proves files were not edited in place; someone with push rights could still rewrite the whole
   branch. Protecting `nepse-v2-state` with a branch rule (no force-push) would close that.
+
+---
+
+## 10. Phase 2 implemented — market structure & SMC (`smc-1`, branch `nepse-v2`)
+
+Rules: `docs/SMC_SPEC.md` (approved 2026-11-03). **Pre-registered, not tuned, not proven profitable.** Output is an
+OHLCV-based price-structure interpretation; it never claims institutional orders, "smart money" or stop orders.
+
+### What was added
+* `nepse_ta/smc.py` — streaming engine: bar *t* is processed using bars ≤ t only, in the fixed order of spec §3.13.
+  Swings (k=3 daily / 2 weekly, 1-ATR filter, alternation/replacement), HH/HL/LH/LL and state, BOS / CHoCH (MSS-like) /
+  range break with close-vs-wick, displacement, volume and failure states, equal highs/lows, sweeps with reaction
+  states, order blocks (primary [low, high] + body, symmetric, leg after the broken swing, fresh/tested/invalidated/
+  expired), FVGs (fill %, expiry, circuit/long-gap flags), premium/discount (only for a clear ≥ 2 ATR range), weekly
+  structure from **completed weeks only**, up/down-day volume ratio, and Nepali explanation items built only from
+  computed fields.
+* Memory records now carry `analysis_version: "smc-1"` and the `smc` section; the v1.0 plan, stop, targets,
+  eligibility and recommendation rules are byte-for-byte unchanged (`strategy_version: v1.0`). Ledger summaries are
+  split by `strategy_version` (v2.0 recommendations only after Phase 6).
+
+### Implementation-time clarification (disclosed)
+Unit tests showed the approved OB leg window ("lowest low in j−10..j") picks a low from *before* the broken swing in
+an HH/HL uptrend, i.e. the wrong candle. The window now starts after the broken swing (spec §3.12 note). Logic fix
+found by tests before any result was looked at; no parameter changed.
+
+### Bugs found and fixed during Phase 2
+| Bug | Effect | Fix |
+|---|---|---|
+| Unclassified stocks processed twice per run (`res.unclassified` ⊂ `res.analyses`) — **present since Phase 1** | 4 symbols (HEIP, HIDCLP, NIMBPO, RBCLPO) have duplicate lines in the live `2026-11-02` file (16 of 640 lines). Append-only: they stay; readers use the latest line per symbol, so meaning is unchanged. | Unique symbols per run; test + mutation check |
+| Revision reason compared fresh (tuples) vs stored (lists) content | Reason text listed sections that had not changed (hash was correct) | Compare canonical JSON |
+| Staleness-derived ineligible reasons in hashed content | Stale stocks re-revised as days pass | Moved to record `context` |
+| Empty weekly frames had object dtype | 1 false weekly "mismatch" in the causality replay | Typed empty frame |
+| Engine O(n²) loops | 0.94 s per long series | Age-bounded newest-first iteration (exact) → 0.37 s |
+
+Production note (not changed, v1 scope): `nepse_ta/cli.py scan` writes `res.analyses + res.unclassified` to the v1
+CSV, so the 4 unclassified stocks appear twice in the production `stocks.csv` too.
+
+### Verification
+* **117 tests pass** (35 SMC + memory/other); lint clean.
+* Mandatory look-ahead tests: snapshot from one pass over the full series == fresh engine on data truncated at t;
+  multiplying all future prices ×3 leaves t unchanged; scaling all prices ×0.9 leaves every label/event unchanged;
+  incomplete week never used; mirror-image (bullish ↔ bearish) test for swings, BOS, CHoCH, OB.
+* Mutation check: 12 rule mutations (BOS on wick, peeking 2 future bars, non-strict tie, no swing filter, no OB
+  displacement, old OB window, no FVG minimum, incomplete week, CHoCH labelled BOS, no sweep minimum, keep duplicate
+  stocks, …) are all caught; one mutation (break of a not-yet-confirmed swing) is *equivalent* — swings are only
+  appended after confirmation, so the guard cannot be reached.
+* **Causality replay on real data** (30 random stocks, every 5th session 2025-01 → 2026-10): **2,515 daily checks,
+  0 mismatches; 2,515 weekly checks, 0 mismatches** (after the dtype fix).
+* **Descriptive statistics** (244 stocks, 413 stock-years, 2025–26; *no performance claim*): per stock-year ≈ 37
+  swings, 1.3 bullish / 2.3 bearish BOS, 1.9 / 2.0 CHoCH, 3.0 / 3.5 range breaks, 1.9 / 1.8 OBs, 11 / 7 FVGs,
+  14–16 sweeps per side, 2–3.5 equal-high/low zones. A break event occurs on 5.7 % of bars. Outcomes: BOS 1,289 failed
+  vs 196 intact; CHoCH 860 failed, 699 structure-confirmed; FVG mostly filled (4,202) or invalidated (2,419). Flags:
+  528 FVGs on circuit-like days, 1,135 across long gaps — warnings, not removed.
+* Live v2 run (`41566921932`): 325 revisions once (`analysis_version_changed (v1-only → smc-1)`), second run 325
+  duplicates, 0 new recommendations, v1 plans identical; hash chain ok.
+
+### Limitations
+* Daily resolution only: intraday order of sweep vs break is unknown; no lower timeframe.
+* Volume has no buy/sell split; "accumulation-like" is an up-day/down-day ratio only.
+* Circuit-limit days and holidays create artificial gaps/zones (flagged).
+* Many BOS fail and many FVGs fill — whether any of this helps trading is untested until Phase 7.
+* Record size roughly doubled (~245 KB per trading day gzip, ≈ 60 MB/year).

@@ -375,3 +375,27 @@ def test_v1_and_v2_paper_tracking_are_separate():
     assert L.summarize_ledger(st, strategy_version="v1.0")["recommendations"] == 1
     assert L.summarize_ledger(st, strategy_version="v2.0")["recommendations"] == 1
     assert "v1.0" in L.summarize_ledger(st, strategy_version="v1.0")["label"]
+
+
+
+def test_unclassified_stock_is_stored_once_per_run(tmp_path):
+    d, sm = _universe(tmp_path)
+    del sm["CCC"]  # CCC becomes Unclassified (in res.analyses AND res.unclassified)
+    store = StateStore(tmp_path / "state")
+    last = make_ohlc(n=320).index[-1]
+    res, s = _run(d, sm, store, _now_for(last))
+    assert "CCC" in {a.symbol for a in res.unclassified}
+    rows = list(store.analyses(str(last.date())).read())
+    assert sorted(r["symbol"] for r in rows) == ["AAA", "BBB", "CCC"] and s.new == 3
+
+
+def test_revision_reason_uses_canonical_comparison():
+    from nepse_ta.memory.records import explain_change
+
+    base = {"strategy_version": "v1.0", "analysis_version": "smc-1", "price": {}, "volume": {},
+            "technical": {"status": "x", "daily_trend": "y", "weekly_trend": "z"}, "eligible": False,
+            "score": {"breakdown": [("a", 1)]}, "smc": {"x": 1}}
+    stored = json.loads(json.dumps(base))  # tuples become lists after storage
+    changed = {**base, "price": {"close": 2}}
+    reason = explain_change(stored, changed, same_date=True)
+    assert "changed sections: price" in reason and "score" not in reason and "smc" not in reason

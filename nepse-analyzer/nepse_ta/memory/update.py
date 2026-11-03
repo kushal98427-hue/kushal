@@ -142,7 +142,12 @@ def update_memory(
                 series_cache[sym] = None
         return series_cache[sym]
 
+    # res.unclassified is a SUBSET of res.analyses (kept separately only for reports):
+    # iterate unique symbols so no stock is stored twice in one run.
+    unique: dict[str, object] = {}
     for a in res.analyses + res.unclassified:
+        unique.setdefault(a.symbol, a)
+    for a in unique.values():
         earlier_open = {sym for sym, d0 in active_before if d0 < a.date}
         content = build_content(a, classify(a, watch, earlier_open), smc=_smc_for(a, series_of(a.symbol)))
         rid = record_id(content)
@@ -194,7 +199,7 @@ def update_memory(
     # stocks stored on the previous date that are absent from this run entirely.
     # (Defined from this run's data, so repeated runs report the same list.)
     if res.market_date:
-        everyone = res.analyses + res.unclassified
+        everyone = list(unique.values())
         lagging = {a.symbol for a in everyone if a.date < res.market_date}
         present = {a.symbol for a in everyone}
         prev_date = store.previous_date(res.market_date)
