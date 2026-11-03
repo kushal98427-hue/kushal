@@ -1,0 +1,35 @@
+name: v2 source probe (temporary, nepse-v2 branch only)
+# Checks which public data sources a GitHub runner can reach. Prints HTTP status
+# and size only. Runs only on pushes to the nepse-v2 branch; never on the default branch.
+on:
+  push:
+    branches: [nepse-v2]
+    paths: [".github/workflows/v2-source-probe.yml"]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe
+        run: |
+          UA="Mozilla/5.0 (X11; Linux x86_64) nepse-ta-probe"
+          for u in \
+            https://www.nepalstock.com/api/nots/nepse-index \
+            https://www.nepalstock.com.np/api/nots/nepse-index \
+            https://www.nepalstock.com/api/nots/news/companies/disclosure \
+            https://www.sharesansar.com/ \
+            https://www.sharesansar.com/category/latest \
+            https://www.sharesansar.com/existing-issues \
+            https://merolagani.com/AnnouncementList.aspx \
+            https://merolagani.com/LatestMarket.aspx \
+            https://nepsealpha.com/ \
+            https://www.sebon.gov.np/ \
+            https://cdsc.com.np/ \
+            https://raw.githubusercontent.com/Shubhamnpk/yonepse/main/data/dividend/history.json \
+            https://raw.githubusercontent.com/Shubhamnpk/yonepse/main/data/notify/disclosures.json \
+            https://ntfy.sh/v1/health ; do
+            r=$(curl -sS -m 25 -A "$UA" -o /tmp/body -w "%{http_code} %{size_download}" "$u" 2>&1 | tail -1)
+            echo "$r  $u"
+          done
