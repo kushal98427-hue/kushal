@@ -108,3 +108,76 @@ Data fetch + cache, validation and bonus detection, freshness check, sector map,
 * The mirror can stop updating or change format; v2 must detect this and mark event data "unavailable".
 * Scraping ShareSansar/Merolagani is fragile; keep it to shortlisted stocks, cache results, and never fill gaps with guesses.
 * GitHub schedule delays (finding #4) are outside our control.
+
+---
+
+## 9. Phase 1 implemented — analysis memory & recommendation ledger (branch `nepse-v2`)
+
+**Production untouched:** `.github/workflows/nepse-daily-scan.yml` on `nepse-v2` is byte-identical to the
+production branch; no change to the 21:00 KST schedule, `nepse-reports` publishing or ntfy.
+
+### Where data lives
+Branch **`nepse-v2-state`** (separate from `nepse-reports`), written by `.github/workflows/v2-memory.yml`.
+Nothing depends on runner disk: each run checks the branch out, verifies it, appends, commits and pushes.
+
+```
+state/analyses/<YYYY>/<YYYY-MM-DD>.jsonl.gz   one record per stock per trading date (+ revisions), gzip members
+state/plan_changes.jsonl                      meaningful plan changes with old plan, new plan, reason
+state/recommendations.jsonl                   recommendation events (created → triggered → closed, …)
+state/runs.jsonl                              one line per run: counts, freshness, missing/failed symbols
+```
+
+### Rules (all unit-tested)
+| Rule | How |
+|---|---|
+| Never overwrite | Files are opened in append mode only. Every line stores `_prev` + `_hash` (SHA-256 chain); an edited or deleted line raises `IntegrityError`, and the writer refuses to append to a broken file. Git history keeps every version as a second layer. |
+| Duplicate run | Record content is hashed; identical content for the same stock and trading date is counted as a duplicate and **not appended**. CI runs the update twice per job and fails unless the second run appends 0 records. |
+| Revised analysis | Different content for the same stock/date → new line with `revision`, `supersedes` and a factual `revision_reason` (which sections changed, whether source data or strategy version changed). The original line is never touched. |
+| Missing data | A stock with no new candle gets no record and is listed in `runs.jsonl → no_new_candle`; failed files are listed under `failed`. |
+| Stale data | Records are keyed by the data's trading date, so a stale re-run only produces duplicates; staleness itself lives in the record's `context`, not in the hashed analysis. No recommendation is created when market data is `blocked`. |
+| Plan changes | Logged when classification changes, or — for actionable stocks (A/B/C/E) — when the plan type changes or a level moves > 1 %. (Daily ATR jitter on no-trade stocks is ignored; it produced ~310 meaningless "changes"/day before this rule.) |
+| Recommendations ≠ trades | `kind: system_recommendation_hypothetical`. The system never records or assumes a user execution. |
+| One active rec per stock | A new eligible setup on a stock with a pending/open recommendation is skipped and logged. |
+| Every record carries | trading date, run id, KST/UTC timestamps, source commit/date, freshness, `strategy_version` (`v1.0`), `execution_model` (`exec-1`), code commit. |
+
+### Stored per stock per day
+Price (close, change, 20-day return, 52-week range), volume (volume, relative volume, reliability, turnover,
+liquidity flag), technicals (trends, status, SMAs, RSI, MACD, ATR, candle, patterns, support/resistance
+zones), plan (type, entry zone, entry trigger, stop + basis, T1/T2 + basis, T3 = null, R:R, **`target_is_projection`**),
+thesis, confirmation and invalidation conditions, scenarios, heuristic score, A–E classification, eligibility
+with reasons, warnings. `smc` and `events` are stored as `{"status": "not_available", "reason": …}` until
+Phases 2 and 5 — never as empty "nothing found".
+
+### Outcome model `exec-1` (paper trading)
+Entry window 3 sessions; fill at the open inside the zone, limit fill at the zone top after a gap up,
+**no buying below the zone** (only a fill at entry_low if price trades back into it without touching the
+stop); stop touched first → `invalidated_before_entry`; target reached without a fill → `missed_without_entry`
+(never a win); stock not trading for > 5 days → `expired_stale`; T+2 lock (3 sessions), stop before target
+inside one bar, gaps fill at the open, full exit at T1, time exit after 20 sessions; commission, SEBON, DP,
+slippage and CGT; MFE/MAE in % and R; bonus/right adjustments rescale stored levels so a mechanical price
+drop is not a loss. Data revisions append a `correction` event instead of editing history.
+
+### Verification
+* 76 unit tests pass (17 new in `tests/test_memory.py`: chain + tamper + deletion, duplicate run, missing candle,
+  stale/blocked, revision, recommendation creation, all entry/exit outcomes, bonus rescale, corrections,
+  plan-change rules, required fields).
+* Mutation check: deliberately breaking 9 key lines (no bonus rescale, no duplicate check, overwrite instead
+  of append, no chain check, counting untriggered targets, recommending on blocked data, ignoring costs,
+  self-reclassification, silent overwrite on revision) — every mutant is caught by at least one test.
+  Two tests were too weak at first and were strengthened.
+* Real-data replay of the last 15 sessions (`scripts/replay_memory.py`, `mode: replay`, scratch dir only):
+  325 records on day 1, then ~315 new + duplicates per day, 5–24 plan changes/day, 30 recommendations,
+  24 triggered, 10 closed. **Replay results are a mechanics check, not evidence of edge** (10 trades).
+* Storage: ≈130 KB per trading day (≈33 MB/year).
+
+### Limitations (Phase 1)
+* **No daily v2 schedule yet.** GitHub runs scheduled workflows only from the default branch, so the v2 job
+  runs only when `nepse-v2` is pushed. Recording "every day from today" needs one approved change: adding the
+  v2 step to the production workflow (or merging `nepse-v2`). Until then, days without a push are not recorded
+  live (they can be replayed, but replayed records are labelled `mode: replay`).
+* Content quality is still v1: template thesis, synthetic 2R/3R targets (now flagged), no SMC/events.
+* `exec-1` exits fully at T1 (no scaling out), ignores order-book depth and circuit queues, and counts holding
+  time in the stock's own bars.
+* Actual user executions are not tracked (by design); a separate user-trade log can be added if wanted.
+* The hash chain proves files were not edited in place; someone with push rights could still rewrite the whole
+  branch. Protecting `nepse-v2-state` with a branch rule (no force-push) would close that.
