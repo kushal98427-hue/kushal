@@ -65,7 +65,7 @@ def _header(res: ScanResult, title: str) -> list[str]:
         f"- **रिपोर्ट बनेको:** {res.run_at_seoul} ({res.run_at_utc} UTC)",
         f"- **डाटा ताजापन:** {FRESH_NP[res.freshness]} — नेपाल मितिअनुसार {res.data_age_days} दिन पुरानो"
         + (f", अपेक्षित पछिल्लो सत्र {res.fresh.expected_session}" if res.fresh else ""),
-        f"- **स्रोत:** github.com/Aabishkar2/nepse-data (`main`, data/company-wise)"
+        "- **स्रोत:** github.com/Aabishkar2/nepse-data (`main`, data/company-wise)"
         + (f", commit `{res.source.commit_sha[:10]}`" if res.source.commit_sha else ""),
         f"- **ऐतिहासिक दर स्थिति:** {calib}",
         "",
@@ -259,7 +259,7 @@ def master_markdown(res: ScanResult, include_agents: bool = False) -> str:
         f"## निष्कर्ष (डाटा मिति {res.market_date})",
         "",
         f"- विश्लेषण गरिएका इक्विटी/म्युचुअल फण्ड: **{n_total}** · पाँच एजेन्टमा मान्य सेटअप: **{n_setups}**",
-        f"- मान्य सेटअपको मापदण्ड: ब्रेकआउट वा अपट्रेन्ड पुलब्याक, R:R (T1) ≥ 1.5, स्कोर ≥ 60, पर्याप्त तरलता, स्टकको डाटा stale नभएको, बजार डाटा BLOCKED नभएको",
+        "- मान्य सेटअपको मापदण्ड: ब्रेकआउट वा अपट्रेन्ड पुलब्याक, R:R (T1) ≥ 1.5, स्कोर ≥ 60, पर्याप्त तरलता, स्टकको डाटा stale नभएको, बजार डाटा BLOCKED नभएको",
     ]
     if m.blocked_reason:
         out += [f"- ⛔ **सेटअप सूची रोकिएको:** {m.blocked_reason}"]
@@ -372,7 +372,7 @@ def data_quality_section(res: ScanResult) -> list[str]:
     if res.inactive:
         out.append("  - " + ", ".join(f"{s} ({d})" for s, d in res.inactive))
     if res.failures:
-        out.append(f"- विश्लेषण हुन नसकेका: " + ", ".join(f"{s} ({m})" for s, m in sorted(res.failures.items())))
+        out.append("- विश्लेषण हुन नसकेका: " + ", ".join(f"{s} ({m})" for s, m in sorted(res.failures.items())))
     out.append("")
     return out
 

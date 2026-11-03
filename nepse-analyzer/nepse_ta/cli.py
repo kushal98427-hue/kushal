@@ -111,6 +111,44 @@ def cmd_notify(args: argparse.Namespace) -> int:
     return 1 if any(v.startswith("error") for v in res.values()) else 0
 
 
+def cmd_v2_update(args: argparse.Namespace) -> int:
+    """v2 Phase 1: run the (unchanged v1) scan and append it to the persistent memory."""
+    from dataclasses import asdict
+
+    from nepse_ta.memory.ledger import replay, summarize_ledger
+    from nepse_ta.memory.store import StateStore
+    from nepse_ta.memory.update import update_memory
+    from nepse_ta.scan import load_fetch, run_scan
+
+    sector_map = load_sector_map(args.sector_map)
+    fetch = load_fetch(args.source_dir, args.cache_dir, sector_map, _symbols(args.symbols))
+    if not fetch.files:
+        log.error("No CSV files available; memory not updated.")
+        return 1
+    now = dt.datetime.fromisoformat(args.now) if args.now else None
+    res = run_scan(fetch, sector_map, DEFAULT_SETTINGS, now_utc=now)
+    store = StateStore(args.state_dir)
+    summ = update_memory(res, store, fetch.files, now_utc=now)
+    out = asdict(summ)
+    out["no_new_candle"] = len(summ.no_new_candle)
+    out["failed"] = len(summ.failed)
+    out["ledger"] = summarize_ledger(replay(list(store.recommendations.read())))
+    print(json.dumps(out, ensure_ascii=False, indent=1))
+    return 0
+
+
+def cmd_v2_verify(args: argparse.Namespace) -> int:
+    from nepse_ta.memory.store import IntegrityError, StateStore
+
+    try:
+        counts = StateStore(args.state_dir).verify_all()
+    except IntegrityError as exc:
+        print(f"INTEGRITY FAILURE: {exc}")
+        return 1
+    print(json.dumps({"files": len(counts), "lines": sum(counts.values()), "ok": True}))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="nepse_ta", description="NEPSE 5-agent technical scanner")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -135,6 +173,16 @@ def main(argv: list[str] | None = None) -> int:
     pb.add_argument("--out", type=Path, default=ROOT / "reports" / "backtest")
     pb.add_argument("--workers", type=int, default=None)
     pb.set_defaults(func=cmd_backtest)
+
+    pv = sub.add_parser("v2-update", help="v2: scan + append to persistent memory/ledger")
+    common(pv)
+    pv.add_argument("--state-dir", type=Path, required=True)
+    pv.add_argument("--now", help="Override current time (ISO, UTC)")
+    pv.set_defaults(func=cmd_v2_update)
+
+    pw = sub.add_parser("v2-verify", help="v2: verify the hash chains of the memory")
+    pw.add_argument("--state-dir", type=Path, required=True)
+    pw.set_defaults(func=cmd_v2_verify)
 
     pn = sub.add_parser("notify", help="Send optional ntfy/Telegram notification (needs secrets)")
     pn.add_argument("--scan", type=Path, default=ROOT / "reports" / "latest" / "scan.json")

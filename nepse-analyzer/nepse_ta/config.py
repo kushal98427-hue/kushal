@@ -19,6 +19,11 @@ EXPECTED_COLUMNS: tuple[str, ...] = (
     "status",
 )
 NEPAL_TZ = "Asia/Kathmandu"
+#: Version of the analysis/trading rules. Bump whenever a rule that can change a
+#: plan, score or recommendation changes; every stored record carries it.
+STRATEGY_VERSION = "v1.0"
+#: Version of the paper-trading execution model used for recommendation outcomes.
+EXECUTION_MODEL_VERSION = "exec-1"
 SEOUL_TZ = "Asia/Seoul"
 
 

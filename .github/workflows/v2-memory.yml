@@ -1,0 +1,94 @@
+name: v2 memory (nepse-v2 branch only)
+
+# Phase 1 of the v2 upgrade. Runs ONLY on pushes to the nepse-v2 branch (scheduled
+# workflows run only from the default branch, so this cannot affect the v1 21:00 KST job).
+# State is persisted in git on the separate `nepse-v2-state` branch, never on runner disk.
+on:
+  push:
+    branches: [nepse-v2]
+    paths:
+      - "nepse-analyzer/**"
+      - ".github/workflows/v2-memory.yml"
+
+permissions:
+  contents: write # push to nepse-v2-state only
+
+concurrency:
+  group: nepse-v2-memory
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: nepse-analyzer
+
+jobs:
+  memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: nepse-analyzer/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: python -m pytest -q
+
+      - name: Check out state branch (create it on first run)
+        run: |
+          set -euo pipefail
+          STATE="$RUNNER_TEMP/v2-state"
+          echo "STATE=$STATE" >> "$GITHUB_ENV"
+          if git ls-remote --exit-code --heads origin nepse-v2-state >/dev/null 2>&1; then
+            git fetch --depth=1 origin nepse-v2-state
+            git worktree add --detach "$STATE" FETCH_HEAD
+          else
+            git worktree add --detach "$STATE"
+            git -C "$STATE" checkout --orphan nepse-v2-state-new
+            git -C "$STATE" rm -rf -q --ignore-unmatch .
+            find "$STATE" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+            printf '%s\n' "# nepse-v2-state" "" \
+              "Append-only memory of the v2 NEPSE analyst (Phase 1). Written by .github/workflows/v2-memory.yml." \
+              "Do not edit by hand: every file is hash-chained and edits are detected." > "$STATE/README.md"
+          fi
+          python -m nepse_ta v2-verify --state-dir "$STATE/state" || { echo "::error::state integrity check failed"; exit 1; }
+
+      - name: Update memory
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m nepse_ta v2-update --state-dir "$STATE/state" | tee "$RUNNER_TEMP/run1.json"
+
+      - name: Idempotency check (second identical run must append nothing)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python -m nepse_ta v2-update --state-dir "$STATE/state" | tee "$RUNNER_TEMP/run2.json"
+          python - <<'EOF'
+          import json, os
+          r = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "run2.json")))
+          assert r["new"] == 0 and r["revised"] == 0 and r["recs_created"] == 0, r
+          print("idempotent: new=0 revised=0 recs_created=0, duplicates =", r["duplicate"])
+          EOF
+          python -m nepse_ta v2-verify --state-dir "$STATE/state"
+
+      - name: Commit state to nepse-v2-state
+        run: |
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cd "$STATE"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No state changes."
+          else
+            git commit -q -m "v2 memory update $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin HEAD:refs/heads/nepse-v2-state
+          fi
