@@ -256,6 +256,29 @@ def test_withdrawn_and_status_replay():
     assert "hypothetical" in summary["label"]
 
 
+def test_replay_and_live_can_never_share_a_store(tmp_path):
+    d, sm = _universe(tmp_path)
+    last = make_ohlc(n=320).index[-1]
+    live = StateStore(tmp_path / "live")
+    fetch = load_from_local_dir(d)
+    res = run_scan(fetch, sm, now_utc=_now_for(last))
+    update_memory(res, live, fetch.files, now_utc=_now_for(last), mode="live")
+    with pytest.raises(ValueError, match="refusing"):
+        update_memory(res, live, fetch.files, now_utc=_now_for(last), mode="replay")
+    replay_store = StateStore(tmp_path / "replay")
+    update_memory(res, replay_store, fetch.files, now_utc=_now_for(last), mode="replay")
+    with pytest.raises(ValueError, match="refusing"):
+        update_memory(res, replay_store, fetch.files, now_utc=_now_for(last), mode="live")
+    # every stored line carries its mode
+    assert {r["mode"] for r in live.runs.read()} == {"live"}
+    for r in live.recommendations.read():
+        assert r["mode"] == "live"
+    # performance summaries filter by mode
+    rows = [{"rec_id": "A", "type": "created", "mode": "replay", **REC}]
+    assert L.summarize_ledger(L.replay(rows), mode="live")["recommendations"] == 0
+    assert L.summarize_ledger(L.replay(rows), mode="replay")["recommendations"] == 1
+
+
 def test_records_store_required_fields(tmp_path):
     d, sm = _universe(tmp_path)
     store = StateStore(tmp_path / "state")

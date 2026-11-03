@@ -90,5 +90,13 @@ jobs:
             echo "No state changes."
           else
             git commit -q -m "v2 memory update $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin HEAD:refs/heads/nepse-v2-state
+            # Only this workflow writes nepse-v2-state and runs are serialised (concurrency group),
+            # so a rejected push means something unexpected: retry transient network errors only,
+            # never force-push, and fail loudly (the next run recomputes the same-date records).
+            for i in 1 2 3 4; do
+              if git push origin HEAD:refs/heads/nepse-v2-state; then exit 0; fi
+              echo "push attempt $i failed; retrying in $((2**i))s"; sleep $((2**i))
+            done
+            echo "::error::could not push nepse-v2-state after 4 attempts; state from this run NOT saved"
+            exit 1
           fi

@@ -95,6 +95,11 @@ def update_memory(
     summ = UpdateSummary(run_id=run_id, market_date=res.market_date, freshness=res.freshness)
     summ.failed = dict(res.failures)
     store.verify_all()  # refuse to work on a tampered/corrupted state
+    # One store = one mode. Replayed (historical) and live records must never share a store,
+    # so replay results can never leak into live recommendations or performance.
+    seen_modes = {r.get("mode") for r in store.runs.read()}
+    if seen_modes and seen_modes != {mode}:
+        raise ValueError(f"state dir already holds mode(s) {sorted(map(str, seen_modes))}; refusing to write mode={mode!r}")
 
     if mode not in ("live", "replay", "test"):
         raise ValueError(f"unknown mode {mode!r}")
@@ -194,7 +199,7 @@ def update_memory(
 
     # ---- recommendations -------------------------------------------------
     created_ids = {s.rec_id for s in states.values()}
-    stamp = {"run_id": run_id, "recorded_at_utc": meta["generated_at_utc"]}
+    stamp = {"mode": mode, "run_id": run_id, "recorded_at_utc": meta["generated_at_utc"]}
     for sym, rec in stored_now.items():
         c = rec["content"]
         rec_id = f"{sym}-{c['trading_date']}-{c['strategy_version']}"
@@ -220,7 +225,7 @@ def update_memory(
         if sym in active_syms:
             summ.recs_skipped_active.append(sym)
             continue
-        rec_new.append({**L.created_event(rec, run_id), "recorded_at_utc": meta["generated_at_utc"]})
+        rec_new.append({**L.created_event(rec, run_id), "mode": mode, "recorded_at_utc": meta["generated_at_utc"]})
         summ.recs_created += 1
     if rec_new:
         store.recommendations.append(rec_new)

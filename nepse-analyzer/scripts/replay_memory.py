@@ -55,7 +55,7 @@ def main() -> None:
         print(f"{d} {res.freshness:8s} new={s.new:3d} dup={s.duplicate:3d} rev={s.revised} plan_changes={s.plan_changes:3d} "
               f"recs+={s.recs_created} events+={s.rec_events} no_new_candle={len(s.no_new_candle)}")
         shutil.rmtree(day_dir)
-    print(json.dumps(summarize_ledger(replay(list(StateStore(args.state_dir).recommendations.read()))), indent=1))
+    print(json.dumps(summarize_ledger(replay(list(StateStore(args.state_dir).recommendations.read())), mode="replay"), indent=1))
 
 
 if __name__ == "__main__":

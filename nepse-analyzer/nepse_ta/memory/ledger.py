@@ -264,8 +264,13 @@ def created_event(analysis_record: dict, run_id: str) -> dict:
     }
 
 
-def summarize_ledger(states: dict[str, RecState]) -> dict:
-    """Paper-trading performance (separate from backtest and from user trades)."""
+def summarize_ledger(states: dict[str, RecState], mode: str = "live") -> dict:
+    """Paper-trading performance (separate from backtest and from user trades).
+
+    Only recommendations of ``mode`` are counted; events written before the ``mode``
+    field existed are treated as live (they were produced by the live workflow).
+    """
+    states = {k: v for k, v in states.items() if v.created.get("mode", "live") == mode}
     closed = [s for s in states.values() if s.status == "closed"]
     rs = [s.outcome_events[-1]["realized_r"] for s in closed if s.outcome_events[-1].get("realized_r") is not None]
     wins = [r for r in rs if r > 0]
@@ -273,7 +278,7 @@ def summarize_ledger(states: dict[str, RecState]) -> dict:
     for s in states.values():
         by_status[s.status] = by_status.get(s.status, 0) + 1
     return {
-        "label": "paper-trading (system recommendations, hypothetical fills)",
+        "label": f"paper-trading [{mode}] (system recommendations, hypothetical fills)",
         "recommendations": len(states),
         "triggered": sum(s.triggered for s in states.values()),
         "by_status": by_status,
