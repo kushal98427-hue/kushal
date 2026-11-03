@@ -223,10 +223,11 @@ CSV, so the 4 unclassified stocks appear twice in the production `stocks.csv` to
 * Mandatory look-ahead tests: snapshot from one pass over the full series == fresh engine on data truncated at t;
   multiplying all future prices ×3 leaves t unchanged; scaling all prices ×0.9 leaves every label/event unchanged;
   incomplete week never used; mirror-image (bullish ↔ bearish) test for swings, BOS, CHoCH, OB.
-* Mutation check: 12 rule mutations (BOS on wick, peeking 2 future bars, non-strict tie, no swing filter, no OB
-  displacement, old OB window, no FVG minimum, incomplete week, CHoCH labelled BOS, no sweep minimum, keep duplicate
-  stocks, …) are all caught; one mutation (break of a not-yet-confirmed swing) is *equivalent* — swings are only
-  appended after confirmation, so the guard cannot be reached.
+* Mutation check: 12 mutations — **11 caught** (BOS on wick, peeking 2 future bars, non-strict tie, no swing filter,
+  no OB displacement, old OB window, no FVG minimum, incomplete week, CHoCH labelled BOS, no sweep minimum, keep
+  duplicate stocks), **1 equivalent** (break of a not-yet-confirmed swing: swings are only appended after
+  confirmation, so that guard can never be reached and no test can distinguish it). The sweep-minimum mutant
+  survived at first; a test was added.
 * **Causality replay on real data** (30 random stocks, every 5th session 2025-01 → 2026-10): **2,515 daily checks,
   0 mismatches; 2,515 weekly checks, 0 mismatches** (after the dtype fix).
 * **Descriptive statistics** (244 stocks, 413 stock-years, 2025–26; *no performance claim*): per stock-year ≈ 37
