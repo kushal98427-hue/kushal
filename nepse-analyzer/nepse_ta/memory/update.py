@@ -173,14 +173,20 @@ def update_memory(
         by_date.setdefault(d, []).append(rec)
         stored_now[a.symbol] = rec
 
-    # stocks with no new candle on the market date (had one before)
+    # stocks without a candle on the market date: analysed but last traded earlier, plus
+    # stocks stored on the previous date that are absent from this run entirely.
+    # (Defined from this run's data, so repeated runs report the same list.)
     if res.market_date:
-        analysed_today = {a.symbol for a in res.analyses + res.unclassified if a.date == res.market_date}
+        everyone = res.analyses + res.unclassified
+        lagging = {a.symbol for a in everyone if a.date < res.market_date}
+        present = {a.symbol for a in everyone}
         prev_date = store.previous_date(res.market_date)
+        vanished: set[str] = set()
         if prev_date:
             if prev_date not in date_cache:
                 date_cache[prev_date] = store.latest_by_symbol(prev_date)
-            summ.no_new_candle = sorted(set(date_cache[prev_date]) - analysed_today)
+            vanished = set(date_cache[prev_date]) - present
+        summ.no_new_candle = sorted(lagging | vanished)
 
     for d, rows in sorted(by_date.items()):
         store.analyses(d).append(rows)

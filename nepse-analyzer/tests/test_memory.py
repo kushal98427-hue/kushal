@@ -77,13 +77,14 @@ def _run(d, sm, store, now):
 
 
 def test_duplicate_run_appends_nothing(tmp_path):
-    d, sm = _universe(tmp_path)
+    d, sm = _universe(tmp_path, drop_last_for=("CCC",))  # CCC lags one session
     store = StateStore(tmp_path / "state")
     last = make_ohlc(n=320).index[-1]
     _, s1 = _run(d, sm, store, _now_for(last))
     size = {p: p.stat().st_size for p in (tmp_path / "state" / "analyses").rglob("*.gz")}
     _, s2 = _run(d, sm, store, _now_for(last) + dt.timedelta(hours=1))
     assert s1.new == 3 and s2.new == 0 and s2.duplicate == 3 and s2.revised == 0
+    assert s1.no_new_candle == s2.no_new_candle == ["CCC"]  # same answer on every run
     assert {p: p.stat().st_size for p in size} == size  # analysis files untouched
     assert len(list(store.runs.read())) == 2  # but every run is logged
 
