@@ -8,6 +8,7 @@ on:
     branches: [nepse-v2]
     paths:
       - "nepse-analyzer/**"
+      - "!nepse-analyzer/docs/**" # documentation-only pushes do not need a memory run
       - ".github/workflows/v2-memory.yml"
 
 permissions:
