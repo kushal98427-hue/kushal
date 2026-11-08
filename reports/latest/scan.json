@@ -1,9 +1,9 @@
 {
  "meta": {
-  "run_at_utc": "2026-11-07T17:07:43+00:00",
-  "run_at_seoul": "2026-11-08 02:07 KST",
+  "run_at_utc": "2026-11-08T17:19:44+00:00",
+  "run_at_seoul": "2026-11-09 02:19 KST",
   "market_date": "2026-11-06",
-  "data_age_days": 1,
+  "data_age_days": 2,
   "freshness": "current",
   "is_current_session": true,
   "expected_latest_session": "2026-11-06",
